@@ -6,30 +6,46 @@ package os_resources;
 
 public class RAM {
 	
-	private static int[] memory = new int[1024];
-	//pointer contains the index of the last place written to in memory
-	//tail contains the highest index written to in memory
+	private static String[] memory = new String[1024];
+
+	//Don't know if this will be necessary but I thought I would go ahead and add it anyways.
 	private static int pointer;
 	private static int tail = 0;
 	
-	public static void save(int index, int value){
+	public static void save(int index, String value) throws MemoryException{
+		if (index < 0 || index >=1024)
+			throw new MemoryException("Invalid RAM address: Expected value between 0 - 1023.");
 		memory[index] = value;
 		pointer = index;
-		if (tail <= pointer)
+		if (tail < pointer)
 			tail = pointer;
+		pointer++;
 	}
-	public static int load(int index){
-		return index;
+	
+	public static String load(int index) throws MemoryException{
+		if (index < 0 || index >=1024)
+			throw new MemoryException("Invalid RAM address: Expected value between 0 - 1023.");
+		return memory[index];
 	}
+	
+	//Pointer is the index of the next available location in memory (usually tail + 1)
 	public static int getPointer(){
 		return pointer;
 	}
+	
+	//tail contains the highest index written to in memory
+	public static int getTail(){
+		return tail;
+	}
+	
 	public static void clearRAM(){
-		for(int i : memory){
-			memory[i] = 0;
-			pointer = 0;
-			tail = 0;
+		int i = 0;
+		while(i < 2048){
+			memory[i] = null;
+			i++;
 		}
+		pointer = 0;
+		tail = 0;
 	}
 	
 	/*
