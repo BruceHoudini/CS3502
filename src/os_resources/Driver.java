@@ -21,8 +21,12 @@ public class Driver {
 		//hence the "\\"'s instead of the "\"'s.
 		File testfile = new File("C:\\Users\\Bruce Houdini\\OSProjectWorkspace\\OperatingSystemSimulation\\src\\os_resources\\testprogfile.txt");	
 		Loader test = new Loader(testfile);
-		System.out.println(PCB.memory.size());
+		Scheduler scheduletest = new Scheduler();
+		scheduletest.schedule();
 		
+		//debug
+		System.out.println(PCB.memory.size());
+		//debug
 	}
 
 }

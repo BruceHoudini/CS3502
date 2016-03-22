@@ -2,7 +2,7 @@ package os_resources;
 
 public class Process {
 	
-	private int PID, pAddr, numInst, numData, priority, sizeInBuff, sizeOutBuff, sizeTempBuff, rAddrBegin, rAddrEnd;
+	private int PID, pAddr, numInst, numData, priority, sizeInBuff, sizeOutBuff, sizeTempBuff, rAddrBegin, rAddrEnd, inBuffAddr, outBuffAddr, tempBuffAddr;
 	private boolean loadedRAM, isReady;
 	public Process(int PID, int pAddr, int numInst, int numData, int priority, int sizeInBuff, int sizeOutBuff, int sizeTempBuff){
 		this.PID = PID;
@@ -13,8 +13,11 @@ public class Process {
 		this.sizeInBuff = sizeInBuff;
 		this.sizeOutBuff = sizeOutBuff;
 		this.sizeTempBuff = sizeTempBuff;
-		rAddrBegin = 0;
-		rAddrEnd = 0;
+		rAddrBegin = -1;
+		rAddrEnd = -1;
+		inBuffAddr = -1;
+		outBuffAddr = -1;
+		tempBuffAddr = -1;
 		loadedRAM = false;
 		isReady = false;
 	}
@@ -52,7 +55,16 @@ public class Process {
 	public int getRAddrEnd(){
 		return rAddrEnd;
 	}
-	public boolean isLoadedRAM(){
+	public int getInBuffAddr(){
+		return inBuffAddr;
+	}
+	public int getOutBuffAddr(){
+		return outBuffAddr;
+	}
+	public int getTempBuffAddr(){
+		return tempBuffAddr;
+	}
+	public boolean ramLoadState(){
 		return loadedRAM;
 	}
 	public boolean readyStatus(){
@@ -87,6 +99,15 @@ public class Process {
 	}
 	public void setRAddrEnd(int x){
 		rAddrEnd = x;
+	}
+	public void setInBuffAddr(int x){
+		inBuffAddr = x;
+	}
+	public void setOutBuffAddr(int x){
+		outBuffAddr = x;
+	}
+	public void setTempBuffAddr(int x){
+		tempBuffAddr = x;
 	}
 	public void isLoaded(){
 		loadedRAM = true;

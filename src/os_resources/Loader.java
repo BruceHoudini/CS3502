@@ -8,44 +8,15 @@
 		
 		
 		public Loader(File programfile) throws FileNotFoundException, OSException, MemoryException{
-			
-			//try{
 			Scanner scan = new Scanner(programfile);
 			processFile(scan);
 			scan.close();
-			/*}
-			catch(FileNotFoundException exception){
-				System.out.println("File not found");		
-			}*/
-			
 		}
 		private void processFile(Scanner scan)throws OSException, MemoryException{
 			while (scan.hasNextLine()){
 				String line = scan.nextLine();
-				//debug
-				System.out.println(line);
-				//debug
-				int index = 0;
-				if (line.charAt(index) == '/')
-				{
-					index++;
-					if (line.charAt(index) == '/'){
-						index++;
-						if (line.charAt(index) == ' '){
-							index++;
-							line = line.substring(index, line.length());
-							//processControlCard(line, scan));
-							createProcess(line, scan);
-						}
-					}
-				}
-				else{
-					//debug
-					for(int i = 0; i < DISK.getPointer(); i++)
-					System.out.println("This is from DISK: " + DISK.load(0));
-					//debug
-					throw new OSException("'// 'Expected!");
-				}
+				line = stripSlash(line);
+				createProcess(line, scan);
 				processFile(scan);
 			}
 		}
@@ -54,14 +25,17 @@
 			int ccIndex = 0;
 			String PIDst, numInstst, priorityst, sizeInBuffst, sizeOutBuffst, sizeTempBuffst;
 			int PID, numInst, numData, priority, sizeInBuff, sizeOutBuff, sizeTempBuff;
+			
 			//Hamfisted enmasse initialization of PCB variables
 			PID = numInst = numData = priority = sizeInBuff = sizeOutBuff = sizeTempBuff = 0;
 			int pAddr = DISK.getPointer();
+			
 			//Checks if control card is JOB and extracts JOB information for Process creation
 			//if statements exists after calling saving subsequent instruction to disk until
 			//next control card is reached.
 			if (cardType == PType.JOB){
 				ccIndex+=4;
+				
 				//Gets PID from line, converts hex string into decimal integer
 				//Each subsequent three line block does the same thing with other
 				//values necessary to create a Process object
@@ -69,35 +43,18 @@
 				ccIndex += PIDst.length();
 				PID = Integer.parseInt(PIDst, 16);
 				
-				//debug
-				System.out.println(ccIndex);
-				//System.out.println(PIDst);
-				//debug
-				
 				numInstst = getNextLexeme(line, ccIndex);
 				ccIndex += numInstst.length();
 				numInst = Integer.parseInt(numInstst, 16);
-				
-				//debug
-				System.out.println(ccIndex);
-				//System.out.println(numInstst);
-				//debug
-				
+						
 				priorityst = getNextLexeme(line, ccIndex);
 				ccIndex += priorityst.length();
 				priority = Integer.parseInt(priorityst, 16);
-				
-				//debug
-				//System.out.println(PID);
-				System.out.println(ccIndex);
-				//debug
-			
+						
 				saveToDisk(numInst, scan);
 			}
+			
 			line = scan.nextLine();
-			//debug
-			//System.out.println(line);
-			//debug
 			
 			//The following nested "if's" are a hacked together fix. Loop taken from ProcessFile, ProcessControlCard() Removed
 			//Should allow ProcessControlCard() to run twice while keeping the Process variables it needs
@@ -111,32 +68,16 @@
 			//definitely make this class look much cleaner.
 			
 			//...It worked! First try.
-			int index = 0;
-			if (line.charAt(index) == '/')
-			{
-				index++;
-				if (line.charAt(index) == '/'){
-					index++;
-					if (line.charAt(index) == ' '){
-						index++;
-						line = line.substring(index, line.length());
-					}
-				}
-			}
-			else{
-				//debug
-				for(int i = 0; i < DISK.getPointer(); i++)
-				System.out.println("This is from DISK: " + DISK.load(0));
-				//debug
-				throw new OSException("'// 'Expected!");
-			}
+			line = stripSlash(line);
 			cardType = processControlCard(line);
 			ccIndex = 0;
+			
 			//Checks if control card is DATA and extracts DATA information for Process creation
 			//if statements exists after calling saving subsequent instruction to disk until
 			//next control card is reached.
 			if (cardType == PType.DATA){
 				ccIndex+=5;
+				
 				//Takes hex string, converts to decimal integer, stores in respective Process variables
 				//Just like in the "if (cardType == PType.JOB)" check
 				sizeInBuffst = getNextLexeme(line, ccIndex);
@@ -158,17 +99,15 @@
 		
 		private PType processControlCard(String line) throws OSException{
 			String pTypeCheck = getNextLexeme(line, 0);
-			//debug
-			System.out.println(pTypeCheck);
-			//debug
 			PType ccType;
-			if (pTypeCheck.equals("JOB")){
+			
+			if (pTypeCheck.equals("JOB"))
 				ccType = PType.JOB;
-			}
 			else if (pTypeCheck.equals("Data"))
 				ccType = PType.DATA;
 			else if (pTypeCheck.equals("END"))
 				ccType = PType.END_PROC;
+			
 			//This "ND" nonsense is the result of an annoying bug I haven't had the patience to fix properly
 			//The last "// END" control card doesn't have a space between the "//" and the "END" so instead
 			//of "// END" as is standard throughout the rest of the program, the final END is "//END" which
@@ -178,29 +117,40 @@
 				ccType = PType.EOF;
 			else
 				throw new OSException("Expected JOB, DATA, or END Control Card Type");
+			
 			return ccType;
 		}
 		
 		private String getNextLexeme(String line, int origin){
 			int index;
-			//debug
-			//System.out.println(origin);
-			//debug
+			
 			while (origin < line.length() && Character.isWhitespace(line.charAt(origin)))
 				origin++;
+			
 			index = origin;
-			//debug
-			//System.out.println(index);
-			System.out.println(origin);
-			//debug
-			while (index < line.length() && !Character.isWhitespace(line.charAt(index))){
+			
+			while (index < line.length() && !Character.isWhitespace(line.charAt(index)))
 				index++;
-			}
-			//debug
-			System.out.println(index);
-			//System.out.println(origin);
-			//debug
+			
 			return line.substring(origin, index);
+		}
+		
+		private String stripSlash(String line) throws OSException{
+			int index = 0;
+			if (line.charAt(index) == '/'){
+				index++;
+				if (line.charAt(index) == '/'){
+					index++;
+					if (line.charAt(index) == ' '){
+						index++;
+						line = line.substring(index, line.length());
+					}
+				}
+			}
+			else
+				throw new OSException("'// 'Expected!");
+			
+			return line;
 		}
 			
 		//Primary method for saving to DISK. Called after JOB control card detected.
@@ -209,19 +159,11 @@
 		private void saveToDisk(int iterations, Scanner scan) throws MemoryException{
 			int i = DISK.getPointer();
 			int iter = i + iterations;
-			//debug
-			//System.out.println(iter);
-			//debug
 			String temp;
+			
 			while (i < iter){
 				temp = scan.nextLine();
-				//debug
-				//System.out.println(temp.substring(2));
-				//debug
 				DISK.save(i, temp);
-				//debug
-				//System.out.println("Saved to DISK from JOB: " + DISK.load(i));
-				//debug
 				i++;
 			}
 		}
@@ -235,21 +177,19 @@
 			int i = DISK.getPointer();
 			int numWrites = i;
 			String temp = scan.nextLine();
+			
 			while (temp.charAt(0) != '/'){
 				DISK.save(i, temp);
-				//debug
-				//System.out.println("Saved to DISK from DATA: " + DISK.load(i));
-				//debug
 				i++;
 				temp = scan.nextLine();
 			}
+			
 			PType endTest = processControlCard(temp.substring(3, temp.length()));
-			if (endTest != PType.END_PROC && endTest != PType.EOF){
+			
+			if (endTest != PType.END_PROC && endTest != PType.EOF)
 				throw new OSException("Expected END");
-			}
-			if (i - numWrites <= 0){
+			if (i - numWrites <= 0)
 				throw new MemoryException("No Data detected or no Data written when loading data to DISK");
-			}
 			else
 				return i - numWrites;
 		}
