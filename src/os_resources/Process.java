@@ -3,7 +3,7 @@ import cpu_resources.Registers;
 
 public class Process {
 	
-	private int PID, pAddr, numInst, numData, priority, sizeInBuff, sizeOutBuff, sizeTempBuff, rAddrBegin, rAddrEnd, inBuffAddr, outBuffAddr, tempBuffAddr, programCounter;
+	private int PID, pAddr, numInst, numData, priority, sizeInBuff, sizeOutBuff, sizeTempBuff, rAddrBegin, rAddrEnd, inBuffAddr, outBuffAddr, tempBuffAddr, programCounter, inCount, outCount, tempCount;
 	private boolean loadedRAM, isReady;
 	private PState state;
 	private Registers pRegister;
@@ -24,6 +24,9 @@ public class Process {
 		loadedRAM = false;
 		isReady = false;
 		programCounter = 0;
+		inCount = 0;
+		outCount = 0;
+		tempCount = 0;
 		state = PState.NEW;
 		pRegister = new Registers();
 	}
@@ -82,6 +85,15 @@ public class Process {
 	public PState getState(){
 		return state;
 	}
+	public int getInCount(){
+		return inCount;
+	}
+	public int getOutCount(){
+		return outCount;
+	}
+	public int getTempCount(){
+		return tempCount;
+	}
 	public void setPID(int x){
 		PID = x;
 	}
@@ -136,15 +148,29 @@ public class Process {
 	public void pcPlus(){
 		programCounter++;
 	}
+	public void setPC(int count){
+		programCounter = count;
+	}
 	public void setState(PState newState){
 		state = newState;
 	}
-	public void saveRegisterState(Registers toSave){
+	public void copyAllFrom(Registers toSave){
 		pRegister.copyAllRegs(toSave);
 	}
 	public Registers getAllRegisters(){
 		return pRegister;
 	}
+	public void setInCount(int count){
+		inCount = count;
+	}
+	public void setOutCount(int count){
+		outCount = count;
+	}
+	public void setTempCount(int count){
+		tempCount = count;
+	}
+	
+	
 	
 }
 

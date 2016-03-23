@@ -7,7 +7,7 @@ public class Scheduler {
 	
 	//readyQueue is a queue of Process objects which have been loaded into
 	//RAM by the scheduler and are ready for dispatch. readyQueue may be relocated later.
-	public Queue<Process> readyQueue = new LinkedList<Process>();
+	public static Queue<Process> readyQueue = new LinkedList<Process>();
 	
 	//Creates a copy of the highest priority Process within the PCB
 	//Loads Process instructions from DISK into RAM, records RAM Address
