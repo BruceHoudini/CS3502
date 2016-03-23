@@ -71,8 +71,8 @@ public class Scheduler {
 		readyQueue.add(PCB.memory.get(index));
 		
 		//debug
-		System.out.println("This is the processe ID of the first Element");
-		System.out.println(readyQueue.element().getPID());
+		//System.out.println("This is the processe ID of the first Element");
+		//System.out.println(readyQueue.element().getPID());
 		//debug
 		
 	

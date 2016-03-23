@@ -28,8 +28,10 @@ public class Driver {
 		scheduletest.schedule();
 		dispatchertest.dispatch(cputest);
 		
+		//cputest.compute();
+		
 		//debug
-		System.out.println(PCB.memory.size());
+		//System.out.println(PCB.memory.size());
 		//debug
 	}
 

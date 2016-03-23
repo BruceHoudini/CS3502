@@ -163,7 +163,7 @@
 			
 			while (i < iter){
 				temp = scan.nextLine();
-				DISK.save(i, temp);
+				DISK.save(i, temp.substring(2, 10));
 				i++;
 			}
 		}
@@ -179,7 +179,7 @@
 			String temp = scan.nextLine();
 			
 			while (temp.charAt(0) != '/'){
-				DISK.save(i, temp);
+				DISK.save(i, temp.substring(2, 10));
 				i++;
 				temp = scan.nextLine();
 			}
