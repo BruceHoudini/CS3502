@@ -1,9 +1,12 @@
 package os_resources;
+import cpu_resources.Registers;
 
 public class Process {
 	
-	private int PID, pAddr, numInst, numData, priority, sizeInBuff, sizeOutBuff, sizeTempBuff, rAddrBegin, rAddrEnd, inBuffAddr, outBuffAddr, tempBuffAddr;
+	private int PID, pAddr, numInst, numData, priority, sizeInBuff, sizeOutBuff, sizeTempBuff, rAddrBegin, rAddrEnd, inBuffAddr, outBuffAddr, tempBuffAddr, programCounter;
 	private boolean loadedRAM, isReady;
+	private PState state;
+	private Registers pRegister;
 	public Process(int PID, int pAddr, int numInst, int numData, int priority, int sizeInBuff, int sizeOutBuff, int sizeTempBuff){
 		this.PID = PID;
 		this.pAddr = pAddr;
@@ -20,6 +23,9 @@ public class Process {
 		tempBuffAddr = -1;
 		loadedRAM = false;
 		isReady = false;
+		programCounter = 0;
+		state = PState.NEW;
+		pRegister = new Registers();
 	}
 	
 	//Obnoxiously long list of getters/setters
@@ -69,6 +75,12 @@ public class Process {
 	}
 	public boolean readyStatus(){
 		return isReady;
+	}
+	public int getProgramCounter(){
+		return programCounter;
+	}
+	public PState getState(){
+		return state;
 	}
 	public void setPID(int x){
 		PID = x;
@@ -120,6 +132,18 @@ public class Process {
 	}
 	public void notReady(){
 		isReady = false;
+	}
+	public void pcPlus(){
+		programCounter++;
+	}
+	public void setState(PState newState){
+		state = newState;
+	}
+	public void saveRegisterState(Registers toSave){
+		pRegister.copyAllRegs(toSave);
+	}
+	public Registers getAllRegisters(){
+		return pRegister;
 	}
 	
 }

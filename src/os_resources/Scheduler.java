@@ -12,62 +12,70 @@ public class Scheduler {
 	//Creates a copy of the highest priority Process within the PCB
 	//Loads Process instructions from DISK into RAM, records RAM Address
 	//of instructions, input, output, and temporary buffers within corresponding
-	//variables of the copied Process. The copied process is added to the
-	//readyQueue and is removed from the PCB.
+	//variables of the copied Process. The copied process is added to the readyQueue.
 	public void schedule() throws MemoryException{
 		int priority = 0;
 		int index = 0;
 		
-		//Finds Process in PCB with highest priority and records its index
+		//Finds Process in PCB with highest priority that is not already
+		//in ready queue and records its index
 		for (int i = 0; i < PCB.memory.size(); i++){
 			if (priority >= PCB.memory.get(i).getPriority()){
-				priority = PCB.memory.get(i).getPriority();
-				index = i;
+				if (PCB.memory.get(i).getState() != PState.READY){
+						priority = PCB.memory.get(i).getPriority();
+						index = i;
+				}
 			}
 		}
 		
 		//Creates copy of highest priority Process in PCB
-		Process preLoad = PCB.memory.get(index);
+		//Process preLoad = PCB.memory.get(index);
+		
 		
 		//Assigns base register to rAddrBegin and loads Process
 		//instructions from DISK to RAM
-		preLoad.setRAddrBegin(RAM.getPointer());
-		for (int i = 0; i < preLoad.getNumInst(); i++)
-			RAM.save(DISK.load(i + preLoad.getPAddr()));
+		PCB.memory.get(index).setRAddrBegin(RAM.getPointer());
+		for (int i = 0; i < PCB.memory.get(index).getNumInst(); i++)
+			RAM.save(DISK.load(i + PCB.memory.get(index).getPAddr()));
 		
 		//Assigns RAM address of input buffer and loads input 
 		//from DISK into RAM
-		preLoad.setInBuffAddr(RAM.getPointer());
-		for (int i = 0; i < preLoad.getSizeInBuff(); i++)
+		PCB.memory.get(index).setInBuffAddr(RAM.getPointer());
+		for (int i = 0; i < PCB.memory.get(index).getSizeInBuff(); i++)
 		{
-			RAM.save(DISK.load(i + preLoad.getInBuffAddr()));
+			RAM.save(DISK.load(i + PCB.memory.get(index).getInBuffAddr()));
 		}
 		
 		//As there are no values for output in DISK, the necessary
 		// output buffer memory is "allocated" and its beginning address 
 		//recorded. RAM pointer is moved manually as no save() commands are used.
-		preLoad.setOutBuffAddr(RAM.getPointer());
-		RAM.setPointer(preLoad.getOutBuffAddr() + preLoad.getSizeOutBuff());
+		PCB.memory.get(index).setOutBuffAddr(RAM.getPointer());
+		RAM.setPointer(PCB.memory.get(index).getOutBuffAddr() + PCB.memory.get(index).getSizeOutBuff());
 		
 		//As there are no values for output in DISK, the necessary
 		//temporary buffer memory is "allocated" and its beginning address 
 		//recorded. RAM pointer is moved manually as no save() commands are used.
-		preLoad.setTempBuffAddr(RAM.getPointer());
-		RAM.setPointer(preLoad.getTempBuffAddr() + preLoad.getSizeTempBuff());
+		PCB.memory.get(index).setTempBuffAddr(RAM.getPointer());
+		RAM.setPointer(PCB.memory.get(index).getTempBuffAddr() + PCB.memory.get(index).getSizeTempBuff());
 		
 		//Records the last address in RAM belonging to current process
-		preLoad.setRAddrEnd(RAM.getPointer() - 1);
+		PCB.memory.get(index).setRAddrEnd(RAM.getPointer() - 1);
 		
-		preLoad.isLoaded();
-		preLoad.Ready();
+		PCB.memory.get(index).isLoaded();
+		PCB.memory.get(index).setState(PState.READY);
+		//PCB.memory.get(index).Ready();
+		
+		
 		
 		//Adds cloned process with added RAM Address values to readyQueue
-		readyQueue.add(preLoad);
+		readyQueue.add(PCB.memory.get(index));
+		
+		//debug
 		System.out.println("This is the processe ID of the first Element");
 		System.out.println(readyQueue.element().getPID());
+		//debug
 		
-		//Destroys original process in PCB
-		PCB.memory.remove(index);
+	
 		
 	}
 
