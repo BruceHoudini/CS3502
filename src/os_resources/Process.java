@@ -28,7 +28,7 @@ public class Process {
 		outCount = 0;
 		tempCount = 0;
 		state = PState.NEW;
-		pRegister = new Registers();
+		//pRegister = new Registers();
 	}
 	
 	//Obnoxiously long list of getters/setters

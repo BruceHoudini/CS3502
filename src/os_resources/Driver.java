@@ -2,6 +2,7 @@ package os_resources;
 import java.io.File;
 import java.io.FileNotFoundException;
 import cpu_resources.CPU;
+import cpu_resources.CPUException;
 
 /*
  * NOTE: Anything sandwiched between two "//debug" comments
@@ -14,7 +15,7 @@ import cpu_resources.CPU;
 
 public class Driver {
 	
-	public static void main(String[] args) throws FileNotFoundException, OSException, MemoryException{
+	public static void main(String[] args) throws FileNotFoundException, OSException, MemoryException, CPUException{
 	
 		//File path for my PC, important to note that right click: Copy qualified name doesn't give you the 
 		//Explicit file path for the test document. Also, "\" is an escape character in java so in order to
@@ -25,10 +26,11 @@ public class Driver {
 		CPU cputest = new CPU();
 		Dispatcher dispatchertest= new Dispatcher();
 		Scheduler scheduletest = new Scheduler();
+		
+		//Add Some kind of control loop
 		scheduletest.schedule();
 		dispatchertest.dispatch(cputest);
-		
-		//cputest.compute();
+		cputest.compute();
 		
 		//debug
 		//System.out.println(PCB.memory.size());

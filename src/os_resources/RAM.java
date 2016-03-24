@@ -79,8 +79,40 @@ public class RAM {
 		tail = 0;
 	}
 	
+	//Used by the IOForm Instructions to save data to RAM
+	//Assembly gives indirect address in bytes
+	//RAM is indexed by word, 4 bytes per word. 
+	//Must divide offset by 4 in order to obtain correct RAM index.
+	public static void indirectSave(int base, int offset, String value){
+		int index = base+(offset/4);
+		value = Integer.toHexString(Integer.parseInt(value, 2));
+		value = stringResize(value, 8);
+		memory[index] = value;
+		pointer = index + 1;
+	}
+	//Used by the IOForm Instructions to load data from RAM
+	//Assembly gives indirect address in bytes
+	//RAM is indexed by word, 4 bytes per word. 
+	//Must divide offset by 4 in order to obtain correct RAM index.
+	public static String indirectLoad(int base, int offset){
+		int index = base+(offset/4);
+		System.out.println("This is the value of index in indirect load: " + index);
+		if(memory[index] == null){
+			memory[index] = "0";
+			memory[index] = stringResize(memory[index], 8);
+		}
+		String result = Integer.toBinaryString(Integer.parseInt(memory[index], 16));
+		result = stringResize(result, 32);
+		return result;
+	}
+	
 	public static void setPointer(int x){
 		pointer = x;
+	}
+	public static String stringResize(String string, int size){
+		while (string.length() < size)
+			string = "0" + string;
+		return string;
 	}
 	/*
 	 * Implement if needed: checks if there are any gaps in memory between processes

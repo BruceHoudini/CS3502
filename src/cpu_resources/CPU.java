@@ -8,19 +8,16 @@ import os_resources.RAM;
 //Finish execute, execute will take an Instruction object.
 
 public class CPU {
-	private PCBe pcb;
-	private InsFormat insForm;
-	private InsName opCode;
+	public PCBe pcb;
+	//private InsFormat insForm;
+	//private InsName opCode;
 	public CPU(){
 		pcb = new PCBe();
 	}
 	
 	public void compute() throws MemoryException, CPUException{
-		Fetch();
-		
-		while (pcb.getPC() < pcb.getInCount()){
-			Decode(Fetch());
-		}
+		while (pcb.getPC() < pcb.getNumInst())
+			Execute(Decode(Fetch()));	
 	}
 	
 	
@@ -35,26 +32,53 @@ public class CPU {
 		
 		return binString;
 	}
-	private void Decode(String inst) throws CPUException{
-		if (inst.length() != 32){
+	private Instruction Decode(String inst) throws CPUException{
+		Instruction decodedInstruction;
+		//debug
+		System.out.println(inst);
+		//debug
+		if (inst.length() != 32)
 			throw new CPUException("Instruction too short return error");
+		else if(inst.charAt(0) == '0'){
+			if(inst.charAt(1) == '0'){
+				decodedInstruction = new ArithmeticForm(inst, pcb);
+				return decodedInstruction;
+			}
+			else{
+				decodedInstruction = new CBIForm(inst, pcb);
+				return decodedInstruction;
+			}
 		}
-		else if(inst.charAt(0) == 0){
-			if(inst.charAt(1) == 0)
-				insForm = InsFormat.ARI_FORM;
-			else
-				insForm = InsFormat.CAI_FORM;
+		else if(inst.charAt(0) == '1'){
+			if(inst.charAt(1) == '0'){
+				decodedInstruction = new UJumpForm(inst, pcb);
+				return decodedInstruction;
+			}
+			else{
+				//debug
+				System.out.println(inst.charAt(0));
+				System.out.println(inst.charAt(1));
+				//debug
+				decodedInstruction = new IOForm(inst, pcb);
+				return decodedInstruction;
+			}
 		}
-		else{
-			if(inst.charAt(1) == 0)
-				insForm = InsFormat.UNJ_FORM;
-			else
-				insForm = InsFormat.IOI_FORM;
-		}
+		else
+			throw new CPUException("Instruction not created");
+		/*
+		Instruction instruction = new ArithmeticForm(inst);
+		Instruction instruction2 = new CBIForm(inst);
+		System.out.println(instruction.getFormat());
+		System.out.println(instruction2.getFormat());
+		*/
 		//opCode = getOpCode(inst, insForm);
 	}
 	
-	private void Execute(){
+	private void Execute(Instruction currentInstruction) throws CPUException{
+		if(currentInstruction.execute())
+			pcb.pcPlus();
+		else
+			throw new CPUException("Failed to execute instruction");
 		
 	}
 	//private InsName getOpCode(String inst, InsForm form)
