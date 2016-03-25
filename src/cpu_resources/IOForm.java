@@ -20,8 +20,8 @@ public class IOForm extends Instruction {
 	boolean execute() {
 		if (opcode == InsName.RD_INS){
 			//debug
-			System.out.println("Value of base" + pcb.getBaseRegister());
-			System.out.println("Value of ioAddress: " + ioAddress);
+			//System.out.println("Value of base" + pcb.getBaseRegister());
+			//System.out.println("Value of ioAddress: " + ioAddress);
 			//debug
 			if (ioAddress == 0)
 				pcb.cpuRegister.setReg(sourceReg, RAM.indirectLoad(pcb.getBaseRegister(), Integer.parseInt(pcb.cpuRegister.getReg(sourceTwo))));
@@ -51,7 +51,7 @@ public class IOForm extends Instruction {
 		InsName insName = null;
 		int x = Integer.parseInt(instruct.substring(2, 8), 2);
 		//debug
-		System.out.println(x);
+		//System.out.println(x);
 		//debug
 		switch(x){
 			case 0:	insName = InsName.RD_INS;
@@ -64,7 +64,7 @@ public class IOForm extends Instruction {
 		if(insName == null)
 			throw new CPUException("Opcode does not match expected instruction name");
 		//debug
-		System.out.println(insName);
+		//System.out.println(insName);
 		//debug
 		return insName;
 	}

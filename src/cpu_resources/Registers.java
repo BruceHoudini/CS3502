@@ -12,13 +12,19 @@ public class Registers {
 			while (register[i].length() < 32)
 				register[i] = register[i] + "0";
 		}
+		//debug
+		/*
 		System.out.println("ARE THE REGISTERS SET?!");
 		for(int i = 0; i < 16; i++)
 			System.out.println(register[i]);
+		*/
+		//debug
 	}
 	public void setReg(int index, String val){
-		System.out.println("Index at setReg: " + index);
-		System.out.println("StringValue at setReg: " + val);
+		//debug
+		//System.out.println("Index at setReg: " + index);
+		//System.out.println("StringValue at setReg: " + val);
+		//debug
 		if(val.length() < 32)
 			while (val.length() < 32)
 				val = "0" + val;

@@ -28,9 +28,11 @@ public class Driver {
 		Scheduler scheduletest = new Scheduler();
 		
 		//Add Some kind of control loop
-		scheduletest.schedule();
-		dispatchertest.dispatch(cputest);
-		cputest.compute();
+		for(int i = 0; i < PCB.memory.size(); i++){
+			scheduletest.schedule();
+			dispatchertest.dispatch(cputest);
+			cputest.compute();
+		}
 		
 		//debug
 		//System.out.println(PCB.memory.size());

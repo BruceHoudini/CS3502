@@ -14,19 +14,23 @@ public class Scheduler {
 	//of instructions, input, output, and temporary buffers within corresponding
 	//variables of the copied Process. The copied process is added to the readyQueue.
 	public void schedule() throws MemoryException{
-		int priority = 0;
+		//Priority set to some arbitrarily large value for the purposes of initial priority check
+		int priority = 1000;
 		int index = 0;
 		
-		//Finds Process in PCB with highest priority that is not already
+		//Finds Process in PCB with highest priority (meaning, lowest priority number) that is not already
 		//in ready queue and records its index
 		for (int i = 0; i < PCB.memory.size(); i++){
-			if (priority >= PCB.memory.get(i).getPriority()){
-				if (PCB.memory.get(i).getState() != PState.READY){
+			if (/*priority >= PCB.memory.get(i).getPriority()*/PCB.memory.get(i).getState() == PState.NEW || PCB.memory.get(i).getState() == PState.WAITING){
+				if (/*PCB.memory.get(i).getState() == PState.NEW || PCB.memory.get(i).getState() == PState.WAITING */ priority >= PCB.memory.get(i).getPriority()){
 						priority = PCB.memory.get(i).getPriority();
 						index = i;
 				}
 			}
 		}
+		//debug
+		System.out.println(PCB.memory.get(index).getState());
+		//debug
 		
 		//Creates copy of highest priority Process in PCB
 		//Process preLoad = PCB.memory.get(index);
@@ -73,6 +77,8 @@ public class Scheduler {
 		//debug
 		//System.out.println("This is the processe ID of the first Element");
 		//System.out.println(readyQueue.element().getPID());
+		System.out.println(PCB.memory.get(index).getState());
+		System.out.println(PCB.memory.get(index).getPID());
 		//debug
 		
 	

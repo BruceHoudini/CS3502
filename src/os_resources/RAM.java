@@ -96,7 +96,9 @@ public class RAM {
 	//Must divide offset by 4 in order to obtain correct RAM index.
 	public static String indirectLoad(int base, int offset){
 		int index = base+(offset/4);
-		System.out.println("This is the value of index in indirect load: " + index);
+		//debug
+		//System.out.println("This is the value of index in indirect load: " + index);
+		//debug
 		if(memory[index] == null){
 			memory[index] = "0";
 			memory[index] = stringResize(memory[index], 8);

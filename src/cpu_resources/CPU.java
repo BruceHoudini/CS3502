@@ -2,7 +2,9 @@ package cpu_resources;
 import java.math.BigInteger;
 
 import os_resources.MemoryException;
+import os_resources.PState;
 import os_resources.RAM;
+import os_resources.Scheduler;
 
 //Finish decode, decode will return Instruction object.
 //Finish execute, execute will take an Instruction object.
@@ -18,6 +20,11 @@ public class CPU {
 	public void compute() throws MemoryException, CPUException{
 		while (pcb.getPC() < pcb.getNumInst())
 			Execute(Decode(Fetch()));	
+		Scheduler.readyQueue.remove().setState(PState.TERMINATED);
+		RAM.setPointer(0);
+		//debug
+		//System.out.println(pcb.getPID());
+		//debug
 	}
 	
 	
@@ -35,7 +42,7 @@ public class CPU {
 	private Instruction Decode(String inst) throws CPUException{
 		Instruction decodedInstruction;
 		//debug
-		System.out.println(inst);
+		//System.out.println(inst);
 		//debug
 		if (inst.length() != 32)
 			throw new CPUException("Instruction too short return error");
@@ -56,8 +63,8 @@ public class CPU {
 			}
 			else{
 				//debug
-				System.out.println(inst.charAt(0));
-				System.out.println(inst.charAt(1));
+				//System.out.println(inst.charAt(0));
+				//System.out.println(inst.charAt(1));
 				//debug
 				decodedInstruction = new IOForm(inst, pcb);
 				return decodedInstruction;
@@ -65,6 +72,8 @@ public class CPU {
 		}
 		else
 			throw new CPUException("Instruction not created");
+		
+		//Don't even remember what this is but I'm afraid to delete it
 		/*
 		Instruction instruction = new ArithmeticForm(inst);
 		Instruction instruction2 = new CBIForm(inst);
@@ -79,7 +88,6 @@ public class CPU {
 			pcb.pcPlus();
 		else
 			throw new CPUException("Failed to execute instruction");
-		
 	}
 	//private InsName getOpCode(String inst, InsForm form)
 		//Implement this tomorrow.

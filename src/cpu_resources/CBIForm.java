@@ -34,8 +34,10 @@ public class CBIForm extends Instruction{
 			return true;
 		}
 		else if (opcode == InsName.ADDI_INS){
-			System.out.println("This is the value of sourceRegister in ADDI_INS: " + sourceReg);
-			System.out.println("This is the register value at reg[sourceReg] in ADDI_INS: " + pcb.cpuRegister.getReg(sourceReg));
+			//debug
+			//System.out.println("This is the value of sourceRegister in ADDI_INS: " + sourceReg);
+			//System.out.println("This is the register value at reg[sourceReg] in ADDI_INS: " + pcb.cpuRegister.getReg(sourceReg));
+			//debug
 			int base = new BigInteger(pcb.cpuRegister.getReg(sourceReg), 2).intValue();
 			int sum = base + addressData;
 			String result = Integer.toBinaryString(sum);
@@ -62,9 +64,9 @@ public class CBIForm extends Instruction{
 		}
 		else if (opcode == InsName.LDI_INS ){
 			//debug
-			System.out.println("This is the sourceRegister in LDI_INS execute: " + sourceReg);
-			System.out.println("This is the value of BaseRegister: " + pcb.getBaseRegister());
-			System.out.println("This is the value of addressData: " + addressData);
+			//System.out.println("This is the sourceRegister in LDI_INS execute: " + sourceReg);
+			//System.out.println("This is the value of BaseRegister: " + pcb.getBaseRegister());
+			//System.out.println("This is the value of addressData: " + addressData);
 			//debug
 			pcb.cpuRegister.setReg(sourceReg, RAM.indirectLoad(pcb.getBaseRegister(), addressData));
 			return true;
@@ -192,7 +194,7 @@ public class CBIForm extends Instruction{
 		if(insName == null)
 			throw new CPUException("Opcode does not match expected instruction name");
 		//debug
-		System.out.println(insName);
+		//System.out.println(insName);
 		//debug
 		return insName;
 	}

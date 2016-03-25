@@ -6,7 +6,7 @@ public class Dispatcher {
 	
 	public void dispatch(CPU cpu){
 		
-		transferAllValuesToCPUPCB(Scheduler.readyQueue.remove(), cpu.getPCB());
+		transferAllValuesToCPUPCB(Scheduler.readyQueue.element(), cpu.getPCB());
 	}
 	private void transferAllValuesToCPUPCB(Process readyProcess, PCBe cpuPCB){
 		//cpuPCB.copyAllFrom(readyProcess.getAllRegisters());
