@@ -40,15 +40,15 @@
 				//Each subsequent three line block does the same thing with other
 				//values necessary to create a Process object
 				PIDst = getNextLexeme(line, ccIndex);
-				ccIndex += PIDst.length();
+				ccIndex += (PIDst.length()+1);
 				PID = Integer.parseInt(PIDst, 16);
 				
 				numInstst = getNextLexeme(line, ccIndex);
-				ccIndex += numInstst.length();
+				ccIndex += (numInstst.length()+1);
 				numInst = Integer.parseInt(numInstst, 16);
 						
 				priorityst = getNextLexeme(line, ccIndex);
-				ccIndex += priorityst.length();
+				ccIndex += (priorityst.length()+1);
 				priority = Integer.parseInt(priorityst, 16);
 						
 				saveToDisk(numInst, scan);
@@ -81,20 +81,21 @@
 				//Takes hex string, converts to decimal integer, stores in respective Process variables
 				//Just like in the "if (cardType == PType.JOB)" check
 				sizeInBuffst = getNextLexeme(line, ccIndex);
-				ccIndex += sizeInBuffst.length();
+				ccIndex += (sizeInBuffst.length()+1);
 				sizeInBuff = Integer.parseInt(sizeInBuffst, 16);
 				
 				sizeOutBuffst = getNextLexeme(line, ccIndex);
-				ccIndex += sizeOutBuffst.length();
+				ccIndex += (sizeOutBuffst.length()+1);
 				sizeOutBuff = Integer.parseInt(sizeOutBuffst, 16);
 				
 				sizeTempBuffst = getNextLexeme(line, ccIndex);
-				ccIndex += sizeTempBuffst.length();
+				ccIndex += (sizeTempBuffst.length()+1);
 				sizeTempBuff = Integer.parseInt(sizeTempBuffst, 16);
 				
 				numData = saveToDisk(scan);
 			}
 			PCB.memory.add(new Process(PID, pAddr, numInst, numData, priority, sizeInBuff, sizeOutBuff, sizeTempBuff));
+			DISK.setPointer(pAddr + numInst + sizeInBuff + sizeOutBuff + sizeTempBuff);
 		}
 		
 		private PType processControlCard(String line) throws OSException{
@@ -163,6 +164,9 @@
 			
 			while (i < iter){
 				temp = scan.nextLine();
+				//debug
+				//System.out.println(temp.substring(2, 10));
+				//debug
 				DISK.save(i, temp.substring(2, 10));
 				i++;
 			}

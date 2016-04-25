@@ -20,17 +20,17 @@ public class CBIForm extends Instruction{
 	@Override
 	boolean execute() {
 		if(opcode == InsName.ST_INS){
-			RAM.indirectSave(pcb.getBaseRegister(), Integer.parseInt(pcb.cpuRegister.getReg(destination)), pcb.cpuRegister.getReg(sourceReg));
+			RAM.indirectSave(pcb.getBaseRegister(), Integer.parseInt(pcb.cpuRegister.getReg(destination), 2), pcb.cpuRegister.getReg(sourceReg));
 			return true;
 		}
 		else if (opcode == InsName.LW_INS  ){
-			pcb.cpuRegister.setReg(sourceReg, RAM.indirectLoad(pcb.getBaseRegister(), Integer.parseInt(pcb.cpuRegister.getReg(destination))));
+			pcb.cpuRegister.setReg(destination, RAM.indirectLoad(pcb.getBaseRegister(), Integer.parseInt(pcb.cpuRegister.getReg(sourceReg), 2)));
 			return true;
 		}
 		else if (opcode == InsName.MOVI_INS){
 			String result = Integer.toBinaryString(addressData);
 			result = resizeString(result);
-			pcb.cpuRegister.setReg(sourceReg, result);
+			pcb.cpuRegister.setReg(destination, result);
 			return true;
 		}
 		else if (opcode == InsName.ADDI_INS){
@@ -38,28 +38,28 @@ public class CBIForm extends Instruction{
 			//System.out.println("This is the value of sourceRegister in ADDI_INS: " + sourceReg);
 			//System.out.println("This is the register value at reg[sourceReg] in ADDI_INS: " + pcb.cpuRegister.getReg(sourceReg));
 			//debug
-			int base = new BigInteger(pcb.cpuRegister.getReg(sourceReg), 2).intValue();
+			int base = new BigInteger(pcb.cpuRegister.getReg(destination), 2).intValue();
 			int sum = base + addressData;
 			String result = Integer.toBinaryString(sum);
 			result = resizeString(result);
-			pcb.cpuRegister.setReg(sourceReg, result);
+			pcb.cpuRegister.setReg(destination, result);
 			
 			return true;
 		}
 		else if (opcode == InsName.MULI_INS){
-			int base = new BigInteger(pcb.cpuRegister.getReg(sourceReg), 2).intValue();
+			int base = new BigInteger(pcb.cpuRegister.getReg(destination), 2).intValue();
 			int sum = base * addressData;
 			String result = Integer.toBinaryString(sum);
 			result = resizeString(result);
-			pcb.cpuRegister.setReg(sourceReg, result);
+			pcb.cpuRegister.setReg(destination, result);
 			return true;
 		}
 		else if (opcode == InsName.DIVI_INS){
-			int base = new BigInteger(pcb.cpuRegister.getReg(sourceReg), 2).intValue();
+			int base = new BigInteger(pcb.cpuRegister.getReg(destination), 2).intValue();
 			int sum = base / addressData;
 			String result = Integer.toBinaryString(sum);
 			result = resizeString(result);
-			pcb.cpuRegister.setReg(sourceReg, result);
+			pcb.cpuRegister.setReg(destination, result);
 			return true;
 		}
 		else if (opcode == InsName.LDI_INS ){
@@ -68,7 +68,20 @@ public class CBIForm extends Instruction{
 			//System.out.println("This is the value of BaseRegister: " + pcb.getBaseRegister());
 			//System.out.println("This is the value of addressData: " + addressData);
 			//debug
-			pcb.cpuRegister.setReg(sourceReg, RAM.indirectLoad(pcb.getBaseRegister(), addressData));
+			/*
+			int base = new BigInteger(pcb.cpuRegister.getReg(destination), 2).intValue();
+			String result = Integer.toBinaryString(addressData);
+			result = resizeString(result);
+			if (base == 0)
+				pcb.cpuRegister.setReg(destination, result);
+			else
+				pcb.cpuRegister.setReg(destination, RAM.indirectLoad(pcb.getBaseRegister(), addressData));
+			*/
+
+			String result = Integer.toBinaryString(addressData);
+			result = resizeString(result);
+			pcb.cpuRegister.setReg(destination, result);
+			
 			return true;
 		}
 		else if (opcode == InsName.SLTI_INS){
@@ -137,6 +150,16 @@ public class CBIForm extends Instruction{
 	
 	@Override
 	void parseRegisters(String instruct){
+		
+		sourceReg = Integer.parseInt(instruct.substring(8, 12), 2);
+		destination = Integer.parseInt(instruct.substring(12, 16), 2);
+		addressData = Integer.parseInt(instruct.substring(16, 32), 2);
+		
+		
+		
+		
+		
+		/*
 		int x;
 		x = Integer.parseInt(instruct.substring(16, 32), 2);
 		if(x != 0){
@@ -149,6 +172,7 @@ public class CBIForm extends Instruction{
 			destination = Integer.parseInt(instruct.substring(12, 16), 2);
 			addressData = 0;
 		}
+		*/
 	}
 
 	@Override

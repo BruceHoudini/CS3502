@@ -23,8 +23,15 @@ public class IOForm extends Instruction {
 			//System.out.println("Value of base" + pcb.getBaseRegister());
 			//System.out.println("Value of ioAddress: " + ioAddress);
 			//debug
-			if (ioAddress == 0)
-				pcb.cpuRegister.setReg(sourceReg, RAM.indirectLoad(pcb.getBaseRegister(), Integer.parseInt(pcb.cpuRegister.getReg(sourceTwo))));
+			//debug
+			System.out.println("The value of sourceReg is: " + sourceReg + "\n sourcereg contains the string: " + pcb.cpuRegister.getReg(sourceReg));
+			System.out.println("This is the string stored in register of sourceTwo: " + pcb.cpuRegister.getReg(sourceTwo));
+			System.out.println("This is the decimal value in the register " + sourceTwo + ": " + Integer.parseInt(pcb.cpuRegister.getReg(sourceTwo), 2));
+			System.out.println("This is the value of ioAddress: " + ioAddress);
+			System.out.println("THIS IS THE VALUE OF THE BASE REGISTER: " + pcb.getBaseRegister());
+			//debug
+			if (ioAddress == 0){
+				pcb.cpuRegister.setReg(sourceReg, RAM.indirectLoad(pcb.getBaseRegister(), Integer.parseInt(pcb.cpuRegister.getReg(sourceTwo), 2)));}
 			else
 				pcb.cpuRegister.setReg(sourceReg, RAM.indirectLoad(pcb.getBaseRegister(), ioAddress));
 			return true;

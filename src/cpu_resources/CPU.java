@@ -84,6 +84,11 @@ public class CPU {
 	}
 	
 	private void Execute(Instruction currentInstruction) throws CPUException{
+		//debug
+		System.out.println("This is the value of the program counter: " + pcb.getPC());
+		System.out.println("This is the instruction type: " + currentInstruction.getFormat());
+		System.out.println("This is the instruction name: " + currentInstruction.getOpCode());
+		//debug
 		if(currentInstruction.execute())
 			pcb.pcPlus();
 		else

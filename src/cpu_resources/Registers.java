@@ -20,10 +20,17 @@ public class Registers {
 		*/
 		//debug
 	}
+	public void resetRegisters(){
+		for(int i = 0; i < 16; i++){
+			register[i] = "0";
+			while (register[i].length() < 32)
+				register[i] = register[i] + "0";
+		}
+	}
 	public void setReg(int index, String val){
 		//debug
-		//System.out.println("Index at setReg: " + index);
-		//System.out.println("StringValue at setReg: " + val);
+		System.out.println("Index at setReg: " + index);
+		System.out.println("StringValue at setReg: " + val + "\n");
 		//debug
 		if(val.length() < 32)
 			while (val.length() < 32)

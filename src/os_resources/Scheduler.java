@@ -14,6 +14,7 @@ public class Scheduler {
 	//of instructions, input, output, and temporary buffers within corresponding
 	//variables of the copied Process. The copied process is added to the readyQueue.
 	public void schedule() throws MemoryException{
+		
 		//Priority set to some arbitrarily large value for the purposes of initial priority check
 		int priority = 1000;
 		int index = 0;
@@ -21,10 +22,30 @@ public class Scheduler {
 		//Finds Process in PCB with highest priority (meaning, lowest priority number) that is not already
 		//in ready queue and records its index
 		for (int i = 0; i < PCB.memory.size(); i++){
-			if (/*priority >= PCB.memory.get(i).getPriority()*/PCB.memory.get(i).getState() == PState.NEW || PCB.memory.get(i).getState() == PState.WAITING){
-				if (/*PCB.memory.get(i).getState() == PState.NEW || PCB.memory.get(i).getState() == PState.WAITING */ priority >= PCB.memory.get(i).getPriority()){
+			//debug
+			//System.out.println("THIS IS THE PROCESS ID: " + PCB.memory.get(i).getPID() + " THIS IS THE PRIORITY: " + PCB.memory.get(i).getPriority());
+			//System.out.println("THIS IS THE PROCESS ID: " + PCB.memory.get(i).getPID() + " THIS IS THE NUMBER OF INSTRUCTIONS: " + PCB.memory.get(i).getNumInst());
+			//debug
+			if (PCB.memory.get(i).getState() == PState.NEW || PCB.memory.get(i).getState() == PState.WAITING){
+				if (priority > PCB.memory.get(i).getPriority()){
+						//debug
+						//System.out.println("Priority before: " + priority);
+						//debug
 						priority = PCB.memory.get(i).getPriority();
+						
+						//debug
+						//System.out.println("Priority after: " + priority);
+						//debug
+						
+						//debug
+						//System.out.println("Index before: " +index);
+						//debug
+						
 						index = i;
+						
+						//debug
+						//System.out.println("Index after: " +index);
+						//debug
 				}
 			}
 		}
@@ -39,15 +60,22 @@ public class Scheduler {
 		//Assigns base register to rAddrBegin and loads Process
 		//instructions from DISK to RAM
 		PCB.memory.get(index).setRAddrBegin(RAM.getPointer());
-		for (int i = 0; i < PCB.memory.get(index).getNumInst(); i++)
+		for (int i = 0; i < PCB.memory.get(index).getNumInst(); i++){
 			RAM.save(DISK.load(i + PCB.memory.get(index).getPAddr()));
+			//debug
+			System.out.println("INSTRUCTION LOAD: PID: " + PCB.memory.get(index).getPID() + " : Loaded to RAM : " +DISK.load(i + PCB.memory.get(index).getPAddr()));
+			//debug
+		}
 		
 		//Assigns RAM address of input buffer and loads input 
 		//from DISK into RAM
 		PCB.memory.get(index).setInBuffAddr(RAM.getPointer());
 		for (int i = 0; i < PCB.memory.get(index).getSizeInBuff(); i++)
 		{
-			RAM.save(DISK.load(i + PCB.memory.get(index).getInBuffAddr()));
+			RAM.save(DISK.load(i + PCB.memory.get(index).getPAddr() + PCB.memory.get(index).getNumInst()));
+			//debug
+			System.out.println("INPUT LOAD: PID: " + PCB.memory.get(index).getPID() + " : Loaded to RAM : " + DISK.load(i + PCB.memory.get(index).getPAddr() + PCB.memory.get(index).getNumInst()));
+			//debug
 		}
 		
 		//As there are no values for output in DISK, the necessary
@@ -75,10 +103,22 @@ public class Scheduler {
 		readyQueue.add(PCB.memory.get(index));
 		
 		//debug
-		//System.out.println("This is the processe ID of the first Element");
+		//System.out.println("This is the process ID of the first Element");
 		//System.out.println(readyQueue.element().getPID());
+		System.out.println("");
 		System.out.println(PCB.memory.get(index).getState());
-		System.out.println(PCB.memory.get(index).getPID());
+		System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+		System.out.println("***********************************************");
+		System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+		System.out.println("");
+		System.out.println("THIS IS THE PROCESS ID OF THE READIED PROCESS: " + PCB.memory.get(index).getPID() + "\n");
+		System.out.println("");
+		System.out.println("THIS PROCESS HAS INSTRUCTION LENGTH: " + PCB.memory.get(index).getNumInst());
+		System.out.println("THIS PROCESS HAS NUMDATA: " + PCB.memory.get(index).getNumData());
+		System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+		System.out.println("***********************************************");
+		System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+		System.out.println("");
 		//debug
 		
 	

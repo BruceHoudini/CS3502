@@ -10,6 +10,7 @@ public class Dispatcher {
 	}
 	private void transferAllValuesToCPUPCB(Process readyProcess, PCBe cpuPCB){
 		//cpuPCB.copyAllFrom(readyProcess.getAllRegisters());
+		cpuPCB.cpuRegister.resetRegisters();
 		cpuPCB.setCPUID(1);
 		cpuPCB.setPID(readyProcess.getPID());
 		cpuPCB.setPC(readyProcess.getProgramCounter());;

@@ -26,6 +26,9 @@ public class DISK{
 			throw new MemoryException("Invalid DISK address: Expected value between 0 - 2048.");
 		return memory[index];
 	}
+	public static void setPointer(int x){
+		pointer = x;
+	}
 	
 	//Pointer is the index of the next available location in memory (usually tail + 1)
 	public static int getPointer(){

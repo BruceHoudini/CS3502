@@ -41,6 +41,10 @@ public class RAM {
 		memory[pointer] = value;
 		if (tail < pointer)
 			tail = pointer;
+		
+		//debug
+		System.out.println("THIS IS THE RAM POINTER: " + pointer);
+		//debug
 		pointer++;
 	}
 	
@@ -71,7 +75,7 @@ public class RAM {
 	
 	public static void clearRAM(){
 		int i = 0;
-		while(i < 2048){
+		while(i < 1024){
 			memory[i] = null;
 			i++;
 		}
@@ -97,14 +101,22 @@ public class RAM {
 	public static String indirectLoad(int base, int offset){
 		int index = base+(offset/4);
 		//debug
-		//System.out.println("This is the value of index in indirect load: " + index);
+		System.out.println("This is the value of index in indirect load: " + index);
 		//debug
 		if(memory[index] == null){
 			memory[index] = "0";
 			memory[index] = stringResize(memory[index], 8);
 		}
+		//debug
+		System.out.println("This is what is stored within memory[index]: " + memory[index]);
+		//debug
+		
 		String result = Integer.toBinaryString(Integer.parseInt(memory[index], 16));
 		result = stringResize(result, 32);
+		
+		//debug
+		System.out.println("This is the value of RESULT in RAM.indirectLoad: " + result);
+		//debug
 		return result;
 	}
 	
@@ -112,6 +124,10 @@ public class RAM {
 		pointer = x;
 	}
 	public static String stringResize(String string, int size){
+		if (string.length() == size || string.length() > size){
+			System.out.println("ERROR IN STRINGRESIZE: String is already larger than or equal to specified size.");
+			return string;
+		}
 		while (string.length() < size)
 			string = "0" + string;
 		return string;

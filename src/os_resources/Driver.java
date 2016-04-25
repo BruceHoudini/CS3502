@@ -21,7 +21,10 @@ public class Driver {
 		//Explicit file path for the test document. Also, "\" is an escape character in java so in order to
 		//Use file paths which include "\" (which is all Windows files) you need to double down on the slashes
 		//hence the "\\"'s instead of the "\"'s.
-		File testfile = new File("C:\\Users\\Bruce Houdini\\OSProjectWorkspace\\OperatingSystemSimulation\\src\\os_resources\\testprogfile.txt");	
+		
+		File testfile = new File("C:\\Users\\Bruce Houdini\\OSProjectWorkspace\\OperatingSystemSimulation\\src\\os_resources\\testprogfile.txt");
+		//File testfile = new File("C:\\Users\\Bruce Houdini\\OSProjectWorkspace\\OperatingSystemSimulation\\src\\os_resources\\temptestprogfile.txt");
+		
 		Loader loadertest = new Loader(testfile);
 		CPU cputest = new CPU();
 		Dispatcher dispatchertest= new Dispatcher();
