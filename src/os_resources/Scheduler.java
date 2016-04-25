@@ -1,5 +1,10 @@
 package os_resources;
 
+import cpu_resources.Signal;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.Queue;
 
@@ -8,6 +13,11 @@ public class Scheduler {
 	//readyQueue is a queue of Process objects which have been loaded into
 	//RAM by the scheduler and are ready for dispatch. readyQueue may be relocated later.
 	public static Queue<Process> readyQueue = new LinkedList<Process>();
+	//public static Queue<Process> waitingQueue = new LinkedList<Process>();
+	public static ArrayList<TripleP> availableRAM = new ArrayList<TripleP>();
+	public static Signal signal;
+	
+	
 	
 	//Creates a copy of the highest priority Process within the PCB
 	//Loads Process instructions from DISK into RAM, records RAM Address
@@ -59,6 +69,8 @@ public class Scheduler {
 		
 		//Assigns base register to rAddrBegin and loads Process
 		//instructions from DISK to RAM
+		
+		if (availableRAM.size() == 0 || isSpace(PCB.memory.get(index).getNumInst() + PCB.memory.get(index).getSizeInBuff() + PCB.memory.get(index).getSizeOutBuff() + PCB.memory.get(index).getSizeTempBuff())){
 		PCB.memory.get(index).setRAddrBegin(RAM.getPointer());
 		for (int i = 0; i < PCB.memory.get(index).getNumInst(); i++){
 			RAM.save(DISK.load(i + PCB.memory.get(index).getPAddr()));
@@ -101,6 +113,7 @@ public class Scheduler {
 		
 		//Adds cloned process with added RAM Address values to readyQueue
 		readyQueue.add(PCB.memory.get(index));
+		availableRAM.add(new TripleP(PCB.memory.get(index).getPID(), PCB.memory.get(index).getRAddrBegin(), PCB.memory.get(index).getRAddrEnd()));
 		
 		//debug
 		//System.out.println("This is the process ID of the first Element");
@@ -120,9 +133,53 @@ public class Scheduler {
 		System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
 		System.out.println("");
 		//debug
-		
-	
-		
+		}
 	}
+	
+	public static void removeFromRAMList(int pid){
+		for (int i = 0; i < availableRAM.size(); i++){
+			if (availableRAM.get(i).getPID() == pid)
+				availableRAM.remove(i);
+		}
+	}
+	
+	 public void sortRAMList(){
+	        TripleP temp;
+	        for(int i=0; i < availableRAM.size()-1; i++){
+	            for(int j=1; j < availableRAM.size()-1; j++){
+	                if(availableRAM.get(j-1).getLow() > availableRAM.get(j).getLow()){
+	                    temp=availableRAM.get(j-1);
+	                    availableRAM.set(j-1, availableRAM.get(j));
+	                    availableRAM.set(j, temp);
+	                }
+	            }
+	        }
+	    }
+	 
+	 public boolean isSpace(int size){
+		 boolean result = false;
+		 if(availableRAM.get(0).getLow() > size){
+			 result = true;
+			 RAM.setPointer(0);
+			 return result;
+		 }
+		 else if ((1024 - availableRAM.get(availableRAM.size()-1).getUpper() > size)){
+			 result = true;
+			 RAM.setPointer(availableRAM.get(availableRAM.size()-1).getUpper()+1);
+			 return result;
+		 }
+		 else {
+			 for (int i = 0; i < availableRAM.size()-1; i++){
+				 if (availableRAM.get(i).getUpper() - availableRAM.get(i+1).getLow() > size){
+					 result = true;
+					 RAM.setPointer(availableRAM.get(i).getUpper()+1);
+					 return result;
+				 }
+			 }
+		 }
+			 return result;
+			 
+	 }
+	
 
 }

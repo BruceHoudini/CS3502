@@ -20,8 +20,10 @@ public class CPU {
 	public void compute() throws MemoryException, CPUException{
 		while (pcb.getPC() < pcb.getNumInst())
 			Execute(Decode(Fetch()));	
+		Scheduler.removeFromRAMList(pcb.getPID());
 		Scheduler.readyQueue.remove().setState(PState.TERMINATED);
-		RAM.setPointer(0);
+		
+		//RAM.setPointer(0);
 		//debug
 		//System.out.println(pcb.getPID());
 		//debug
