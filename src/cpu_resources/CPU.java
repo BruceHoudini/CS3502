@@ -28,11 +28,11 @@ public class CPU {
 			Execute(Decode(Fetch()));	
 		
 		
-		//debug
-		System.out.println("PROCESS: " + pcb.getPID() + " : IS COMPLETE");
-		//debug
+		
 		Scheduler.removeFromRAMList(pcb.getPID());
 		PCB.completedProcesses++;
+		
+		
 		pcb.cpuRegister.resetRegisters();
 		pcb.setState(PState.WAITING);
 	}

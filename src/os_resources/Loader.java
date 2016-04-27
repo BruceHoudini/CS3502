@@ -11,6 +11,11 @@
 			Scanner scan = new Scanner(programfile);
 			processFile(scan);
 			scan.close();
+			
+			//The DISK pointer is never reset during the life of the program, but as it is part of the static
+			//DISK class, it retains its value through the iterative, increasing processor core timing loop I've used
+			//in the driver program. I have chose to reset it here, at the termination point of the loader.
+			DISK.setPointer(0);
 		}
 		private void processFile(Scanner scan)throws OSException, MemoryException{
 			while (scan.hasNextLine()){
@@ -64,10 +69,8 @@
 			//double the necessary processes each with only half the necessary information (Either info from JOB
 			//or info from DATA).
 			
-			//If we can make these if loops their own method called "stripControl" or something to that effect it would
-			//definitely make this class look much cleaner.
+			//^^^Made the // removal its own class "stripSlash"
 			
-			//...It worked! First try.
 			line = stripSlash(line);
 			cardType = processControlCard(line);
 			ccIndex = 0;
@@ -165,18 +168,15 @@
 			
 			while (i < iter){
 				temp = scan.nextLine();
-				//debug
-				//System.out.println(temp.substring(2, 10));
-				//debug
 				DISK.save(i, temp.substring(2, 10));
 				i++;
 			}
 		}
 		
 		//@overload
-		//Overloaded saveToDisk() method used as a "scan file, save to disk" loop when the number of iterations is
+		//Overloaded saveToDisk() method used as a "scan file, save to disk" loop when the number of iterations
 		//necessary is unknown and unspecified. Less efficient than the primary saveToDisk method() and is restricted
-		//towards being used only following DATA control cards as result of the check for "// END" which would always
+		//towards being used only following DATA control cards as a result of the check for "// END" which would always
 		//error if used after a JOB control card which is followed by DATA rather than END.
 		private int saveToDisk(Scanner scan) throws OSException, MemoryException{
 			int i = DISK.getPointer();

@@ -41,10 +41,6 @@ public class RAM {
 		memory[pointer] = value;
 		if (tail < pointer)
 			tail = pointer;
-		
-		//debug
-		//System.out.println("THIS IS THE RAM POINTER AFTER SAVE: " + pointer);
-		//debug
 		pointer++;
 	}
 	
@@ -93,10 +89,6 @@ public class RAM {
 		value = stringResize(value, 8);
 		memory[index] = value;
 		pointer = index + 1;
-		
-		//debug
-		//System.out.println("THIS IS THE RAM POINTER AFTER INDIRECT SAVE: " + pointer);
-		//debug
 	}
 	//Used by the IOForm Instructions to load data from RAM
 	//Assembly gives indirect address in bytes
@@ -118,9 +110,6 @@ public class RAM {
 	
 	public static void setPointer(int x){
 		pointer = x;
-		//debug
-		//System.out.println("THIS IS THE RAM POINTER AFTER SETPOINTER: " + pointer);
-		//debug
 	}
 	public static String stringResize(String string, int size){
 		if (string.length() == size || string.length() > size){
@@ -131,16 +120,5 @@ public class RAM {
 			string = "0" + string;
 		return string;
 	}
-	/*
-	 * Implement if needed: checks if there are any gaps in memory between processes
-	 * i.e. Process 1 spans index 0 to index 15, Process 2 spans index 18 to index 32
-	 * where index 16 and 17 are empty.
-	 * 
-	 	public static boolean isContiguous(){
-	 
-	 	}
-	 *
-	 *
-	 */
 
 }

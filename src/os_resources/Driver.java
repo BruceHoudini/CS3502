@@ -27,17 +27,27 @@ public class Driver {
 		File testfile = new File("C:\\Users\\Bruce Houdini\\OSProjectWorkspace\\OperatingSystemSimulation\\src\\os_resources\\testprogfile.txt");
 		//File testfile = new File("C:\\Users\\Bruce Houdini\\OSProjectWorkspace\\OperatingSystemSimulation\\src\\os_resources\\temptestprogfile.txt");
 		
-		Loader loadertest = new Loader(testfile);
-		Dispatcher dispatchertest= new Dispatcher();
-		Scheduler scheduletest = new Scheduler();
+		Loader loadertest;
+		Dispatcher dispatchertest;
+		Scheduler scheduletest;
+		CPU[] cpuArray;
 		
-		int numProcessors = 4;
-		CPU[] cpuArray = new CPU[numProcessors];
+		long startTime;
+		long stopTime;
+		int numProcessors;
+		int maxProcessors = 30;
+		
+		for (numProcessors = 1; numProcessors <= maxProcessors; numProcessors++){
+			
+			loadertest = new Loader(testfile);
+			dispatchertest = new Dispatcher();
+			scheduletest = new Scheduler();
+			
+		cpuArray = new CPU[numProcessors];
 		for (int i = 0; i < numProcessors; i++)
 			cpuArray[i] = new CPU(i);
 		
-		
-		//Add Some kind of control loop
+		startTime = System.nanoTime();
 		while (PCB.processTotal != PCB.completedProcesses){
 			scheduletest.schedule();
 			dispatchertest.dispatch(cpuArray, numProcessors);
@@ -46,7 +56,20 @@ public class Driver {
 					cpuArray[i].compute();
 			}
 		}
+		stopTime = System.nanoTime();
 		
+		System.out.println("\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+		System.out.println("CORE COUNT: " + numProcessors);
+		System.out.println("Numbers of Processes completed: " + PCB.completedProcesses);
+		System.out.print("TOTAL NANOSECONDS FOR COMPLETION: ");
+		System.out.println(stopTime - startTime + " nanoseconds.");
+		System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+		
+		//Static variables mainly used for debugging and, in this case, to control the testing loop for 
+		//CPU times in the driver. Need to be reset or they will accumulate each iteration's program count.
+		PCB.processTotal = 0;
+		PCB.completedProcesses = 0;
+	}
 	}
 
 }

@@ -106,7 +106,7 @@ public class Scheduler {
 		PCB.readyQueue.add(PCB.memory.get(index));
 		
 		
-		//debug
+		/*debug
 		System.out.println("");
 		System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
 		System.out.println("***********************************************");
@@ -120,13 +120,10 @@ public class Scheduler {
 		System.out.println("***********************************************");
 		System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
 		System.out.println("");
-		//debug
+		debug*/
 		
 		sortRAMList();
 		
-		//debug
-		//printRAMList();
-		//debug
 		
 		PCB.memory.remove(index);
 		
