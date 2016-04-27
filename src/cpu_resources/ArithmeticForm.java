@@ -139,9 +139,7 @@ public class ArithmeticForm extends Instruction{
 		}
 		if(insName == null)
 			throw new CPUException("Opcode does not match expected instruction name");
-		//debug
-		//System.out.println(insName);
-		//debug
+
 		return insName;
 	}
 	@Override

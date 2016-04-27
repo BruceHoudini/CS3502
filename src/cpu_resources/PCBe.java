@@ -1,10 +1,33 @@
 package cpu_resources;
+import os_resources.PCB;
 import os_resources.PState;
+import os_resources.Process;
 
 public class PCBe {
-	private int cpuID, PID, PC, numInst, sizeInBuff, sizeOutBuff, sizeTempBuff, baseRegister, inBuffAddr, outBuffAddr, tempBuffAddr, inCount, outCount, tempCount;
+	private int cpuID, PID, PC, numInst, numData, sizeInBuff, sizeOutBuff, sizeTempBuff, baseRegister, inBuffAddr, outBuffAddr, tempBuffAddr, inCount, outCount, tempCount, priority, pAddr;
 	private PState state;
 	public Registers cpuRegister = new Registers();
+	
+	public Process savePCBeToProcess(){
+		Process result = new Process(PID, pAddr, numInst, numData, priority, sizeInBuff, sizeOutBuff, sizeTempBuff);
+		result.setRAddrBegin(baseRegister);
+		result.setRAddrEnd(baseRegister + numInst + sizeInBuff + sizeOutBuff + sizeTempBuff);
+		result.setInBuffAddr(inBuffAddr);
+		result.setOutBuffAddr(outBuffAddr);
+		result.setTempBuffAddr(tempBuffAddr);
+		result.setPC(PC);
+		
+		result.copyAllFrom(getAllRegisters());
+		return result;
+	}
+	public void suspendProcess(){
+		Process result = savePCBeToProcess();
+		result.setState(PState.WAITING);
+		PCB.readyQueue.add(result);
+		cpuRegister.resetRegisters();
+		state = PState.WAITING;
+	}
+	
 	
 	public int getPID(){
 		return PID;
@@ -50,6 +73,18 @@ public class PCBe {
 	}
 	public int getTempCount(){
 		return tempCount;
+	}
+	public int getPAddr(){
+		return pAddr;
+	}
+	public int getPriority(){
+		return priority;
+	}
+	public void setPriority(int x){
+		priority = x;
+	}
+	public void setPAddr(int x){
+		pAddr = x;;
 	}
 	public void setCPUID(int x){
 		cpuID = x;

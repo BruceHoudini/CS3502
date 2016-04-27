@@ -43,7 +43,7 @@ public class RAM {
 			tail = pointer;
 		
 		//debug
-		System.out.println("THIS IS THE RAM POINTER AFTER SAVE: " + pointer);
+		//System.out.println("THIS IS THE RAM POINTER AFTER SAVE: " + pointer);
 		//debug
 		pointer++;
 	}
@@ -95,8 +95,8 @@ public class RAM {
 		pointer = index + 1;
 		
 		//debug
-				System.out.println("THIS IS THE RAM POINTER AFTER INDIRECT SAVE: " + pointer);
-				//debug
+		//System.out.println("THIS IS THE RAM POINTER AFTER INDIRECT SAVE: " + pointer);
+		//debug
 	}
 	//Used by the IOForm Instructions to load data from RAM
 	//Assembly gives indirect address in bytes
@@ -119,8 +119,8 @@ public class RAM {
 	public static void setPointer(int x){
 		pointer = x;
 		//debug
-				System.out.println("THIS IS THE RAM POINTER AFTER SETPOINTER: " + pointer);
-				//debug
+		//System.out.println("THIS IS THE RAM POINTER AFTER SETPOINTER: " + pointer);
+		//debug
 	}
 	public static String stringResize(String string, int size){
 		if (string.length() == size || string.length() > size){

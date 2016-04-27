@@ -1,6 +1,8 @@
 package os_resources;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
+
 import cpu_resources.CPU;
 import cpu_resources.CPUException;
 
@@ -26,15 +28,23 @@ public class Driver {
 		//File testfile = new File("C:\\Users\\Bruce Houdini\\OSProjectWorkspace\\OperatingSystemSimulation\\src\\os_resources\\temptestprogfile.txt");
 		
 		Loader loadertest = new Loader(testfile);
-		CPU cputest = new CPU();
 		Dispatcher dispatchertest= new Dispatcher();
 		Scheduler scheduletest = new Scheduler();
 		
+		int numProcessors = 4;
+		CPU[] cpuArray = new CPU[numProcessors];
+		for (int i = 0; i < numProcessors; i++)
+			cpuArray[i] = new CPU(i);
+		
+		
 		//Add Some kind of control loop
-		for(int i = 0; i < PCB.memory.size(); i++){
+		while (PCB.processTotal != PCB.completedProcesses){
 			scheduletest.schedule();
-			dispatchertest.dispatch(cputest);
-			cputest.compute();
+			dispatchertest.dispatch(cpuArray, numProcessors);
+			for (int i = 0; i < numProcessors; i++){
+				if(cpuArray[i].getPCB().getState() == PState.READY)
+					cpuArray[i].compute();
+			}
 		}
 		
 	}

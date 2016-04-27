@@ -2,6 +2,7 @@ package cpu_resources;
 import java.math.BigInteger;
 
 import os_resources.MemoryException;
+import os_resources.PCB;
 import os_resources.PState;
 import os_resources.RAM;
 import os_resources.Scheduler;
@@ -11,23 +12,29 @@ import os_resources.Scheduler;
 
 public class CPU {
 	public PCBe pcb;
+	public int ID;
+	public Status status;
 	//private InsFormat insForm;
 	//private InsName opCode;
-	public CPU(){
+	public CPU(int id){
 		pcb = new PCBe();
+		pcb.setCPUID(id);
+		pcb.setState(PState.WAITING);
 	}
 	
 	public void compute() throws MemoryException, CPUException{
+		pcb.setState(PState.RUNNING);
 		while (pcb.getPC() < pcb.getNumInst())
 			Execute(Decode(Fetch()));	
 		
-		//THIS WILL NEED TO BE MODIFIED FOR CCONTEXT SWITCHING
+		
 		//debug
 		System.out.println("PROCESS: " + pcb.getPID() + " : IS COMPLETE");
 		//debug
 		Scheduler.removeFromRAMList(pcb.getPID());
-		Scheduler.readyQueue.element().setState(PState.TERMINATED);
-		Scheduler.terminatedQueue.add(Scheduler.readyQueue.remove());
+		PCB.completedProcesses++;
+		pcb.cpuRegister.resetRegisters();
+		pcb.setState(PState.WAITING);
 	}
 	
 	
@@ -78,6 +85,12 @@ public class CPU {
 			pcb.pcPlus();
 		else
 			throw new CPUException("Failed to execute instruction");
+	}
+	public int getCPUID(){
+		return ID;
+	}
+	public Status getStatus(){
+		return status;
 	}
 
 

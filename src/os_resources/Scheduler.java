@@ -12,9 +12,7 @@ public class Scheduler {
 	
 	//readyQueue is a queue of Process objects which have been loaded into
 	//RAM by the scheduler and are ready for dispatch. readyQueue may be relocated later.
-	public static Queue<Process> readyQueue = new LinkedList<Process>();
-	public static Queue<Process> terminatedQueue = new LinkedList<Process>();
-	public static Queue<Process> waitingQueue = new LinkedList<Process>();
+	
 	public static ArrayList<TripleP> availableRAM = new ArrayList<TripleP>();
 	public static Signal signal;
 	
@@ -32,16 +30,22 @@ public class Scheduler {
 		
 		//Finds Process in PCB with highest priority (meaning, lowest priority number) that is not already
 		//in ready queue and records its index
+		//UPDATE: This scheduling loop traverses the process list and continuously loads the highest
+		//priority non-loaded process into RAM until there is not enough memory available for the current highest
+		//priority process. This section utilizes the sorted list of TripleP objects called availableRAM
+		//and method isSpace() to determine if there is enough contiguous memory to load a process.
 		while (index != -1){
 			index = -1;
 		for (int i = 0; i < PCB.memory.size(); i++){
-			if (PCB.memory.get(i).getState() == PState.NEW || PCB.memory.get(i).getState() == PState.WAITING){
+			if (PCB.memory.get(i).getState() == PState.NEW){
 					if (priority > PCB.memory.get(i).getPriority()){
 							priority = PCB.memory.get(i).getPriority();
 							index = i;
 					}
 			}
-			System.out.println(index);
+			//debug
+			//System.out.println(index);
+			//debug
 		}
 		if (index != -1){
 			if (isSpace(PCB.memory.get(index).getNumInst() + PCB.memory.get(index).getSizeInBuff() + PCB.memory.get(index).getSizeOutBuff() + PCB.memory.get(index).getSizeTempBuff()))
@@ -91,23 +95,19 @@ public class Scheduler {
 		
 		PCB.memory.get(index).isLoaded();
 		PCB.memory.get(index).setState(PState.READY);
-		//PCB.memory.get(index).Ready();
 		
 		
 		
 		//Adds cloned process with added RAM Address values to readyQueue
 		TripleP trip = new TripleP(PCB.memory.get(index).getPID(), PCB.memory.get(index).getRAddrBegin(), PCB.memory.get(index).getRAddrEnd());
 		
-		//debug
-		System.out.println("TRIPLE P ADDED WITH PID: " + trip.getPID() + " WITH LOWER BOUND: " + trip.getLow() + " WITH UPPER BOUND: " + trip.getUpper());
 		
 		availableRAM.add(trip);
-		readyQueue.add(PCB.memory.get(index));
+		PCB.readyQueue.add(PCB.memory.get(index));
 		
 		
 		//debug
 		System.out.println("");
-		System.out.println(PCB.memory.get(index).getState());
 		System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
 		System.out.println("***********************************************");
 		System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
@@ -115,18 +115,19 @@ public class Scheduler {
 		System.out.println("THIS IS THE PROCESS ID OF THE READIED PROCESS: " + PCB.memory.get(index).getPID() + "\n");
 		System.out.println("");
 		System.out.println("THIS PROCESS HAS INSTRUCTION LENGTH: " + PCB.memory.get(index).getNumInst());
-		System.out.println("THIS PROCESS HAS NUMDATA: " + PCB.memory.get(index).getNumData());
+		System.out.println("");
 		System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
 		System.out.println("***********************************************");
 		System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
 		System.out.println("");
 		//debug
+		
 		sortRAMList();
+		
 		//debug
-		printRAMList();
+		//printRAMList();
 		//debug
 		
-		//MIGHT CAUSE PROBLEMS
 		PCB.memory.remove(index);
 		
 		}
@@ -138,15 +139,13 @@ public class Scheduler {
 	public static void removeFromRAMList(int pid){
 		for (int i = 0; i < availableRAM.size(); i++){
 			if (availableRAM.get(i).getPID() == pid){
-				//debug
-				System.out.println("Removed from RAM LIST PID: " + availableRAM.get(i).getPID());
-				//debug
 				availableRAM.remove(i);
 			}
 		}
 		sortRAMList();
 	}
 	
+	//Simple bubble sort by lowest address for use in conjunction with isSpace
 	 public static void sortRAMList(){
 	        TripleP temp;
 	        if (availableRAM.size() > 1){
@@ -162,6 +161,7 @@ public class Scheduler {
 	        }
 	    }
 	 
+	 //Checks if RAM contains a contiguous address space greater than or equal to size. 
 	 public boolean isSpace(int size){
 		 boolean result = false;
 		 if (availableRAM.isEmpty()){

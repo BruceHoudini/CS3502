@@ -95,6 +95,7 @@
 				numData = saveToDisk(scan);
 			}
 			PCB.memory.add(new Process(PID, pAddr, numInst, numData, priority, sizeInBuff, sizeOutBuff, sizeTempBuff));
+			PCB.processTotal++;
 			DISK.setPointer(pAddr + numInst + sizeInBuff + sizeOutBuff + sizeTempBuff);
 		}
 		
