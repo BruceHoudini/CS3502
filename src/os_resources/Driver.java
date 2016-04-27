@@ -37,9 +37,6 @@ public class Driver {
 			cputest.compute();
 		}
 		
-		//debug
-		//System.out.println(PCB.memory.size());
-		//debug
 	}
 
 }

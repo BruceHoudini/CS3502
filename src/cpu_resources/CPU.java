@@ -20,13 +20,14 @@ public class CPU {
 	public void compute() throws MemoryException, CPUException{
 		while (pcb.getPC() < pcb.getNumInst())
 			Execute(Decode(Fetch()));	
-		Scheduler.removeFromRAMList(pcb.getPID());
-		Scheduler.readyQueue.remove().setState(PState.TERMINATED);
 		
-		//RAM.setPointer(0);
+		//THIS WILL NEED TO BE MODIFIED FOR CCONTEXT SWITCHING
 		//debug
-		//System.out.println(pcb.getPID());
+		System.out.println("PROCESS: " + pcb.getPID() + " : IS COMPLETE");
 		//debug
+		Scheduler.removeFromRAMList(pcb.getPID());
+		Scheduler.readyQueue.element().setState(PState.TERMINATED);
+		Scheduler.terminatedQueue.add(Scheduler.readyQueue.remove());
 	}
 	
 	
@@ -43,9 +44,6 @@ public class CPU {
 	}
 	private Instruction Decode(String inst) throws CPUException{
 		Instruction decodedInstruction;
-		//debug
-		//System.out.println(inst);
-		//debug
 		if (inst.length() != 32)
 			throw new CPUException("Instruction too short return error");
 		else if(inst.charAt(0) == '0'){
@@ -64,10 +62,6 @@ public class CPU {
 				return decodedInstruction;
 			}
 			else{
-				//debug
-				//System.out.println(inst.charAt(0));
-				//System.out.println(inst.charAt(1));
-				//debug
 				decodedInstruction = new IOForm(inst, pcb);
 				return decodedInstruction;
 			}
@@ -75,28 +69,16 @@ public class CPU {
 		else
 			throw new CPUException("Instruction not created");
 		
-		//Don't even remember what this is but I'm afraid to delete it
-		/*
-		Instruction instruction = new ArithmeticForm(inst);
-		Instruction instruction2 = new CBIForm(inst);
-		System.out.println(instruction.getFormat());
-		System.out.println(instruction2.getFormat());
-		*/
-		//opCode = getOpCode(inst, insForm);
+
 	}
 	
 	private void Execute(Instruction currentInstruction) throws CPUException{
-		//debug
-		System.out.println("This is the value of the program counter: " + pcb.getPC());
-		System.out.println("This is the instruction type: " + currentInstruction.getFormat());
-		System.out.println("This is the instruction name: " + currentInstruction.getOpCode());
-		//debug
+
 		if(currentInstruction.execute())
 			pcb.pcPlus();
 		else
 			throw new CPUException("Failed to execute instruction");
 	}
-	//private InsName getOpCode(String inst, InsForm form)
-		//Implement this tomorrow.
+
 
 }

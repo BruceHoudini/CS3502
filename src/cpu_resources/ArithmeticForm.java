@@ -58,6 +58,11 @@ public class ArithmeticForm extends Instruction{
 			//Could be source of error if order of operations reversed.
 			int base = new BigInteger(pcb.cpuRegister.getReg(sourceOne), 2).intValue();
 			int secondary = new BigInteger(pcb.cpuRegister.getReg(sourceTwo), 2).intValue();
+			if (secondary == 0)
+			{
+				System.out.println("Divid by zero error, operation not completed");
+				return true;
+			}
 			int sum = base / secondary;
 			String result = Integer.toBinaryString(sum);
 			result = resizeString(result);

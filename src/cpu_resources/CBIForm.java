@@ -34,10 +34,7 @@ public class CBIForm extends Instruction{
 			return true;
 		}
 		else if (opcode == InsName.ADDI_INS){
-			//debug
-			//System.out.println("This is the value of sourceRegister in ADDI_INS: " + sourceReg);
-			//System.out.println("This is the register value at reg[sourceReg] in ADDI_INS: " + pcb.cpuRegister.getReg(sourceReg));
-			//debug
+		
 			int base = new BigInteger(pcb.cpuRegister.getReg(destination), 2).intValue();
 			int sum = base + addressData;
 			String result = Integer.toBinaryString(sum);
@@ -63,20 +60,6 @@ public class CBIForm extends Instruction{
 			return true;
 		}
 		else if (opcode == InsName.LDI_INS ){
-			//debug
-			//System.out.println("This is the sourceRegister in LDI_INS execute: " + sourceReg);
-			//System.out.println("This is the value of BaseRegister: " + pcb.getBaseRegister());
-			//System.out.println("This is the value of addressData: " + addressData);
-			//debug
-			/*
-			int base = new BigInteger(pcb.cpuRegister.getReg(destination), 2).intValue();
-			String result = Integer.toBinaryString(addressData);
-			result = resizeString(result);
-			if (base == 0)
-				pcb.cpuRegister.setReg(destination, result);
-			else
-				pcb.cpuRegister.setReg(destination, RAM.indirectLoad(pcb.getBaseRegister(), addressData));
-			*/
 
 			String result = Integer.toBinaryString(addressData);
 			result = resizeString(result);
@@ -154,35 +137,13 @@ public class CBIForm extends Instruction{
 		sourceReg = Integer.parseInt(instruct.substring(8, 12), 2);
 		destination = Integer.parseInt(instruct.substring(12, 16), 2);
 		addressData = Integer.parseInt(instruct.substring(16, 32), 2);
-		
-		
-		
-		
-		
-		/*
-		int x;
-		x = Integer.parseInt(instruct.substring(16, 32), 2);
-		if(x != 0){
-			sourceReg = Integer.parseInt(instruct.substring(12, 16), 2);
-			destination = 0;
-			addressData = x;
-		}
-		else{
-			sourceReg = Integer.parseInt(instruct.substring(8, 12), 2);
-			destination = Integer.parseInt(instruct.substring(12, 16), 2);
-			addressData = 0;
-		}
-		*/
 	}
 
 	@Override
 	InsName parseOpCode(String instruct)throws CPUException {
 		InsName insName = null;
 		int x = Integer.parseInt(instruct.substring(2, 8), 2);
-		//debug
-		//System.out.println("This is the binary opcode substring in CBIForm instruction: " + instruct.substring(2, 8));
-		//System.out.println("This is the opcode within CBIForm instruction: " + x);
-		//debug
+
 		switch(x){
 			case 2:	insName = InsName.ST_INS;
 				break;
@@ -217,9 +178,6 @@ public class CBIForm extends Instruction{
 		}
 		if(insName == null)
 			throw new CPUException("Opcode does not match expected instruction name");
-		//debug
-		//System.out.println(insName);
-		//debug
 		return insName;
 	}
 

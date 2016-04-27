@@ -13,7 +13,8 @@ public class Scheduler {
 	//readyQueue is a queue of Process objects which have been loaded into
 	//RAM by the scheduler and are ready for dispatch. readyQueue may be relocated later.
 	public static Queue<Process> readyQueue = new LinkedList<Process>();
-	//public static Queue<Process> waitingQueue = new LinkedList<Process>();
+	public static Queue<Process> terminatedQueue = new LinkedList<Process>();
+	public static Queue<Process> waitingQueue = new LinkedList<Process>();
 	public static ArrayList<TripleP> availableRAM = new ArrayList<TripleP>();
 	public static Signal signal;
 	
@@ -31,52 +32,38 @@ public class Scheduler {
 		
 		//Finds Process in PCB with highest priority (meaning, lowest priority number) that is not already
 		//in ready queue and records its index
+		while (index != -1){
+			index = -1;
 		for (int i = 0; i < PCB.memory.size(); i++){
-			//debug
-			//System.out.println("THIS IS THE PROCESS ID: " + PCB.memory.get(i).getPID() + " THIS IS THE PRIORITY: " + PCB.memory.get(i).getPriority());
-			//System.out.println("THIS IS THE PROCESS ID: " + PCB.memory.get(i).getPID() + " THIS IS THE NUMBER OF INSTRUCTIONS: " + PCB.memory.get(i).getNumInst());
-			//debug
 			if (PCB.memory.get(i).getState() == PState.NEW || PCB.memory.get(i).getState() == PState.WAITING){
-				if (priority > PCB.memory.get(i).getPriority()){
-						//debug
-						//System.out.println("Priority before: " + priority);
-						//debug
-						priority = PCB.memory.get(i).getPriority();
-						
-						//debug
-						//System.out.println("Priority after: " + priority);
-						//debug
-						
-						//debug
-						//System.out.println("Index before: " +index);
-						//debug
-						
-						index = i;
-						
-						//debug
-						//System.out.println("Index after: " +index);
-						//debug
-				}
+					if (priority > PCB.memory.get(i).getPriority()){
+							priority = PCB.memory.get(i).getPriority();
+							index = i;
+					}
 			}
+			System.out.println(index);
 		}
-		//debug
-		System.out.println(PCB.memory.get(index).getState());
-		//debug
+		if (index != -1){
+			if (isSpace(PCB.memory.get(index).getNumInst() + PCB.memory.get(index).getSizeInBuff() + PCB.memory.get(index).getSizeOutBuff() + PCB.memory.get(index).getSizeTempBuff()))
+				loadProcess(index);
+			else
+				index = -1;
+		}
+		priority = 1000;
+		}
+	}
+		//Should there not be enough memory to schedule a process, index will remain -1 schedule will terminate until CPU is called again.
 		
 		//Creates copy of highest priority Process in PCB
 		//Process preLoad = PCB.memory.get(index);
 		
-		
 		//Assigns base register to rAddrBegin and loads Process
 		//instructions from DISK to RAM
+		public void loadProcess(int index) throws MemoryException{
 		
-		if (availableRAM.size() == 0 || isSpace(PCB.memory.get(index).getNumInst() + PCB.memory.get(index).getSizeInBuff() + PCB.memory.get(index).getSizeOutBuff() + PCB.memory.get(index).getSizeTempBuff())){
 		PCB.memory.get(index).setRAddrBegin(RAM.getPointer());
 		for (int i = 0; i < PCB.memory.get(index).getNumInst(); i++){
 			RAM.save(DISK.load(i + PCB.memory.get(index).getPAddr()));
-			//debug
-			System.out.println("INSTRUCTION LOAD: PID: " + PCB.memory.get(index).getPID() + " : Loaded to RAM : " +DISK.load(i + PCB.memory.get(index).getPAddr()));
-			//debug
 		}
 		
 		//Assigns RAM address of input buffer and loads input 
@@ -85,9 +72,6 @@ public class Scheduler {
 		for (int i = 0; i < PCB.memory.get(index).getSizeInBuff(); i++)
 		{
 			RAM.save(DISK.load(i + PCB.memory.get(index).getPAddr() + PCB.memory.get(index).getNumInst()));
-			//debug
-			System.out.println("INPUT LOAD: PID: " + PCB.memory.get(index).getPID() + " : Loaded to RAM : " + DISK.load(i + PCB.memory.get(index).getPAddr() + PCB.memory.get(index).getNumInst()));
-			//debug
 		}
 		
 		//As there are no values for output in DISK, the necessary
@@ -112,12 +96,16 @@ public class Scheduler {
 		
 		
 		//Adds cloned process with added RAM Address values to readyQueue
-		readyQueue.add(PCB.memory.get(index));
-		availableRAM.add(new TripleP(PCB.memory.get(index).getPID(), PCB.memory.get(index).getRAddrBegin(), PCB.memory.get(index).getRAddrEnd()));
+		TripleP trip = new TripleP(PCB.memory.get(index).getPID(), PCB.memory.get(index).getRAddrBegin(), PCB.memory.get(index).getRAddrEnd());
 		
 		//debug
-		//System.out.println("This is the process ID of the first Element");
-		//System.out.println(readyQueue.element().getPID());
+		System.out.println("TRIPLE P ADDED WITH PID: " + trip.getPID() + " WITH LOWER BOUND: " + trip.getLow() + " WITH UPPER BOUND: " + trip.getUpper());
+		
+		availableRAM.add(trip);
+		readyQueue.add(PCB.memory.get(index));
+		
+		
+		//debug
 		System.out.println("");
 		System.out.println(PCB.memory.get(index).getState());
 		System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
@@ -133,31 +121,54 @@ public class Scheduler {
 		System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
 		System.out.println("");
 		//debug
+		sortRAMList();
+		//debug
+		printRAMList();
+		//debug
+		
+		//MIGHT CAUSE PROBLEMS
+		PCB.memory.remove(index);
+		
 		}
-	}
+		
+		
+	
+	
 	
 	public static void removeFromRAMList(int pid){
 		for (int i = 0; i < availableRAM.size(); i++){
-			if (availableRAM.get(i).getPID() == pid)
+			if (availableRAM.get(i).getPID() == pid){
+				//debug
+				System.out.println("Removed from RAM LIST PID: " + availableRAM.get(i).getPID());
+				//debug
 				availableRAM.remove(i);
+			}
 		}
+		sortRAMList();
 	}
 	
-	 public void sortRAMList(){
+	 public static void sortRAMList(){
 	        TripleP temp;
+	        if (availableRAM.size() > 1){
 	        for(int i=0; i < availableRAM.size()-1; i++){
-	            for(int j=1; j < availableRAM.size()-1; j++){
+	            for(int j = 1; j < availableRAM.size()-i; j++){
 	                if(availableRAM.get(j-1).getLow() > availableRAM.get(j).getLow()){
-	                    temp=availableRAM.get(j-1);
+	                    temp=new TripleP(availableRAM.get(j-1).getPID(), availableRAM.get(j-1).getLow(), availableRAM.get(j-1).getUpper());
 	                    availableRAM.set(j-1, availableRAM.get(j));
 	                    availableRAM.set(j, temp);
 	                }
 	            }
 	        }
+	        }
 	    }
 	 
 	 public boolean isSpace(int size){
 		 boolean result = false;
+		 if (availableRAM.isEmpty()){
+			 RAM.setPointer(0);
+			 result = true;
+			 return result;
+		 }
 		 if(availableRAM.get(0).getLow() > size){
 			 result = true;
 			 RAM.setPointer(0);
@@ -179,6 +190,14 @@ public class Scheduler {
 		 }
 			 return result;
 			 
+	 }
+	 
+	 public static void printRAMList(){
+		 for (int i = 0; i < availableRAM.size(); i++){
+			 System.out.println("This is the PID: " + availableRAM.get(i).getPID());
+			 System.out.println("This is the lower bound: " + availableRAM.get(i).getLow());
+			 System.out.println("This is the upper bound: " + availableRAM.get(i).getUpper());
+		 }
 	 }
 	
 

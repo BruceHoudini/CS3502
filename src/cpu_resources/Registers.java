@@ -12,13 +12,6 @@ public class Registers {
 			while (register[i].length() < 32)
 				register[i] = register[i] + "0";
 		}
-		//debug
-		/*
-		System.out.println("ARE THE REGISTERS SET?!");
-		for(int i = 0; i < 16; i++)
-			System.out.println(register[i]);
-		*/
-		//debug
 	}
 	public void resetRegisters(){
 		for(int i = 0; i < 16; i++){
@@ -28,10 +21,6 @@ public class Registers {
 		}
 	}
 	public void setReg(int index, String val){
-		//debug
-		System.out.println("Index at setReg: " + index);
-		System.out.println("StringValue at setReg: " + val + "\n");
-		//debug
 		if(val.length() < 32)
 			while (val.length() < 32)
 				val = "0" + val;
@@ -45,18 +34,4 @@ public class Registers {
 			register[i] = toSave.getReg(i);
 	}
 	
-	
-	/*public void add(int baseIndex, int secondaryIndex){
-		int base = new BigInteger(register[baseIndex], 2).intValue();
-		int secondary = new BigInteger(register[secondaryIndex], 2).intValue();
-		int result = base + secondary;
-		register[baseIndex] = Integer.toBinaryString(result);
-	}
-	public void subtract(int baseIndex, int secondaryIndex){
-		int base = new BigInteger(register[baseIndex], 2).intValue();
-		int secondary = new BigInteger(register[secondaryIndex], 2).intValue();
-		int result = base - secondary;
-		register[baseIndex] = Integer.toBinaryString(result);
-	}
-	*/
 }

@@ -43,7 +43,7 @@ public class RAM {
 			tail = pointer;
 		
 		//debug
-		System.out.println("THIS IS THE RAM POINTER: " + pointer);
+		System.out.println("THIS IS THE RAM POINTER AFTER SAVE: " + pointer);
 		//debug
 		pointer++;
 	}
@@ -93,6 +93,10 @@ public class RAM {
 		value = stringResize(value, 8);
 		memory[index] = value;
 		pointer = index + 1;
+		
+		//debug
+				System.out.println("THIS IS THE RAM POINTER AFTER INDIRECT SAVE: " + pointer);
+				//debug
 	}
 	//Used by the IOForm Instructions to load data from RAM
 	//Assembly gives indirect address in bytes
@@ -100,28 +104,23 @@ public class RAM {
 	//Must divide offset by 4 in order to obtain correct RAM index.
 	public static String indirectLoad(int base, int offset){
 		int index = base+(offset/4);
-		//debug
-		System.out.println("This is the value of index in indirect load: " + index);
-		//debug
+	
 		if(memory[index] == null){
 			memory[index] = "0";
 			memory[index] = stringResize(memory[index], 8);
 		}
-		//debug
-		System.out.println("This is what is stored within memory[index]: " + memory[index]);
-		//debug
 		
 		String result = Integer.toBinaryString(Integer.parseInt(memory[index], 16));
 		result = stringResize(result, 32);
 		
-		//debug
-		System.out.println("This is the value of RESULT in RAM.indirectLoad: " + result);
-		//debug
 		return result;
 	}
 	
 	public static void setPointer(int x){
 		pointer = x;
+		//debug
+				System.out.println("THIS IS THE RAM POINTER AFTER SETPOINTER: " + pointer);
+				//debug
 	}
 	public static String stringResize(String string, int size){
 		if (string.length() == size || string.length() > size){
