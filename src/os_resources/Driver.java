@@ -50,6 +50,17 @@ public class Driver {
 		startTime = System.nanoTime();
 		while (PCB.processTotal != PCB.completedProcesses){
 			scheduletest.schedule();
+			/*
+			 * 
+			 * FIFO Scheduling for performance testing.
+			 * Toggle either via commenting/uncommenting.
+			 * Although both can be active simultaneously
+			 * The first method to be called will dominate
+			 * the other.
+			 * 
+			 */
+			//scheduletest.scheduleFIFO();
+			
 			dispatchertest.dispatch(cpuArray, numProcessors);
 			for (int i = 0; i < numProcessors; i++){
 				if(cpuArray[i].getPCB().getState() == PState.READY)

@@ -36,25 +36,47 @@ public class Scheduler {
 		//and method isSpace() to determine if there is enough contiguous memory to load a process.
 		while (index != -1){
 			index = -1;
-		for (int i = 0; i < PCB.memory.size(); i++){
-			if (PCB.memory.get(i).getState() == PState.NEW){
-					if (priority > PCB.memory.get(i).getPriority()){
-							priority = PCB.memory.get(i).getPriority();
-							index = i;
-					}
+			for (int i = 0; i < PCB.memory.size(); i++){
+				if (PCB.memory.get(i).getState() == PState.NEW){
+						if (priority > PCB.memory.get(i).getPriority()){
+								priority = PCB.memory.get(i).getPriority();
+								index = i;
+						}
+				}
+				
 			}
-			//debug
-			//System.out.println(index);
-			//debug
+			if (index != -1){
+				if (isSpace(PCB.memory.get(index).getNumInst() + PCB.memory.get(index).getSizeInBuff() + PCB.memory.get(index).getSizeOutBuff() + PCB.memory.get(index).getSizeTempBuff()))
+					loadProcess(index);
+				else
+					index = -1;
+			}
+			priority = 1000;
 		}
-		if (index != -1){
-			if (isSpace(PCB.memory.get(index).getNumInst() + PCB.memory.get(index).getSizeInBuff() + PCB.memory.get(index).getSizeOutBuff() + PCB.memory.get(index).getSizeTempBuff()))
-				loadProcess(index);
-			else
-				index = -1;
+	}
+	
+	//First in first out scheduling algorithm performance testing.
+	public void scheduleFIFO() throws MemoryException{
+		int index = 0;
+		
+		while (index != -1){
+			index = -1;
+			for (int i = 0; i < PCB.memory.size(); i++){
+				if (PCB.memory.get(i).getState() == PState.NEW){
+								index = i;
+				}
+				
+			}
+			if (index != -1){
+				if (isSpace(PCB.memory.get(index).getNumInst() + PCB.memory.get(index).getSizeInBuff() + PCB.memory.get(index).getSizeOutBuff() + PCB.memory.get(index).getSizeTempBuff()))
+					loadProcess(index);
+				else
+					index = -1;
+			}
 		}
-		priority = 1000;
-		}
+		
+		
+		
 	}
 		//Should there not be enough memory to schedule a process, index will remain -1 schedule will terminate until CPU is called again.
 		
@@ -65,68 +87,68 @@ public class Scheduler {
 		//instructions from DISK to RAM
 		public void loadProcess(int index) throws MemoryException{
 		
-		PCB.memory.get(index).setRAddrBegin(RAM.getPointer());
-		for (int i = 0; i < PCB.memory.get(index).getNumInst(); i++){
-			RAM.save(DISK.load(i + PCB.memory.get(index).getPAddr()));
-		}
-		
-		//Assigns RAM address of input buffer and loads input 
-		//from DISK into RAM
-		PCB.memory.get(index).setInBuffAddr(RAM.getPointer());
-		for (int i = 0; i < PCB.memory.get(index).getSizeInBuff(); i++)
-		{
-			RAM.save(DISK.load(i + PCB.memory.get(index).getPAddr() + PCB.memory.get(index).getNumInst()));
-		}
-		
-		//As there are no values for output in DISK, the necessary
-		// output buffer memory is "allocated" and its beginning address 
-		//recorded. RAM pointer is moved manually as no save() commands are used.
-		PCB.memory.get(index).setOutBuffAddr(RAM.getPointer());
-		RAM.setPointer(PCB.memory.get(index).getOutBuffAddr() + PCB.memory.get(index).getSizeOutBuff());
-		
-		//As there are no values for output in DISK, the necessary
-		//temporary buffer memory is "allocated" and its beginning address 
-		//recorded. RAM pointer is moved manually as no save() commands are used.
-		PCB.memory.get(index).setTempBuffAddr(RAM.getPointer());
-		RAM.setPointer(PCB.memory.get(index).getTempBuffAddr() + PCB.memory.get(index).getSizeTempBuff());
-		
-		//Records the last address in RAM belonging to current process
-		PCB.memory.get(index).setRAddrEnd(RAM.getPointer() - 1);
-		
-		PCB.memory.get(index).isLoaded();
-		PCB.memory.get(index).setState(PState.READY);
-		
-		
-		
-		//Adds cloned process with added RAM Address values to readyQueue
-		TripleP trip = new TripleP(PCB.memory.get(index).getPID(), PCB.memory.get(index).getRAddrBegin(), PCB.memory.get(index).getRAddrEnd());
-		
-		
-		availableRAM.add(trip);
-		PCB.readyQueue.add(PCB.memory.get(index));
-		
-		
-		/*debug
-		System.out.println("");
-		System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
-		System.out.println("***********************************************");
-		System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
-		System.out.println("");
-		System.out.println("THIS IS THE PROCESS ID OF THE READIED PROCESS: " + PCB.memory.get(index).getPID() + "\n");
-		System.out.println("");
-		System.out.println("THIS PROCESS HAS INSTRUCTION LENGTH: " + PCB.memory.get(index).getNumInst());
-		System.out.println("");
-		System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
-		System.out.println("***********************************************");
-		System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
-		System.out.println("");
-		debug*/
-		
-		sortRAMList();
-		
-		
-		PCB.memory.remove(index);
-		
+			PCB.memory.get(index).setRAddrBegin(RAM.getPointer());
+			for (int i = 0; i < PCB.memory.get(index).getNumInst(); i++){
+				RAM.save(DISK.load(i + PCB.memory.get(index).getPAddr()));
+			}
+			
+			//Assigns RAM address of input buffer and loads input 
+			//from DISK into RAM
+			PCB.memory.get(index).setInBuffAddr(RAM.getPointer());
+			for (int i = 0; i < PCB.memory.get(index).getSizeInBuff(); i++)
+			{
+				RAM.save(DISK.load(i + PCB.memory.get(index).getPAddr() + PCB.memory.get(index).getNumInst()));
+			}
+			
+			//As there are no values for output in DISK, the necessary
+			// output buffer memory is "allocated" and its beginning address 
+			//recorded. RAM pointer is moved manually as no save() commands are used.
+			PCB.memory.get(index).setOutBuffAddr(RAM.getPointer());
+			RAM.setPointer(PCB.memory.get(index).getOutBuffAddr() + PCB.memory.get(index).getSizeOutBuff());
+			
+			//As there are no values for output in DISK, the necessary
+			//temporary buffer memory is "allocated" and its beginning address 
+			//recorded. RAM pointer is moved manually as no save() commands are used.
+			PCB.memory.get(index).setTempBuffAddr(RAM.getPointer());
+			RAM.setPointer(PCB.memory.get(index).getTempBuffAddr() + PCB.memory.get(index).getSizeTempBuff());
+			
+			//Records the last address in RAM belonging to current process
+			PCB.memory.get(index).setRAddrEnd(RAM.getPointer() - 1);
+			
+			PCB.memory.get(index).isLoaded();
+			PCB.memory.get(index).setState(PState.READY);
+			
+			
+			
+			//Adds cloned process with added RAM Address values to readyQueue
+			TripleP trip = new TripleP(PCB.memory.get(index).getPID(), PCB.memory.get(index).getRAddrBegin(), PCB.memory.get(index).getRAddrEnd());
+			
+			
+			availableRAM.add(trip);
+			PCB.readyQueue.add(PCB.memory.get(index));
+			
+			
+			/*debug
+			System.out.println("");
+			System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+			System.out.println("***********************************************");
+			System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+			System.out.println("");
+			System.out.println("THIS IS THE PROCESS ID OF THE READIED PROCESS: " + PCB.memory.get(index).getPID() + "\n");
+			System.out.println("");
+			System.out.println("THIS PROCESS HAS INSTRUCTION LENGTH: " + PCB.memory.get(index).getNumInst());
+			System.out.println("");
+			System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+			System.out.println("***********************************************");
+			System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+			System.out.println("");
+			debug*/
+			
+			sortRAMList();
+			
+			
+			PCB.memory.remove(index);
+			
 		}
 		
 		
@@ -146,15 +168,15 @@ public class Scheduler {
 	 public static void sortRAMList(){
 	        TripleP temp;
 	        if (availableRAM.size() > 1){
-	        for(int i=0; i < availableRAM.size()-1; i++){
-	            for(int j = 1; j < availableRAM.size()-i; j++){
-	                if(availableRAM.get(j-1).getLow() > availableRAM.get(j).getLow()){
-	                    temp=new TripleP(availableRAM.get(j-1).getPID(), availableRAM.get(j-1).getLow(), availableRAM.get(j-1).getUpper());
-	                    availableRAM.set(j-1, availableRAM.get(j));
-	                    availableRAM.set(j, temp);
-	                }
-	            }
-	        }
+		        for(int i=0; i < availableRAM.size()-1; i++){
+		            for(int j = 1; j < availableRAM.size()-i; j++){
+		                if(availableRAM.get(j-1).getLow() > availableRAM.get(j).getLow()){
+		                    temp=new TripleP(availableRAM.get(j-1).getPID(), availableRAM.get(j-1).getLow(), availableRAM.get(j-1).getUpper());
+		                    availableRAM.set(j-1, availableRAM.get(j));
+		                    availableRAM.set(j, temp);
+		                }
+		            }
+		        }
 	        }
 	    }
 	 
