@@ -8,13 +8,10 @@ import cpu_resources.Status;
 public class Dispatcher {
 	
 	public void dispatch(CPU[] cpuArray, int numProcessors) throws MemoryException{
-		for (int i = 0; i < numProcessors; i++){
-			if (cpuArray[i].getPCB().getState() == PState.WAITING){
-				if (PCB.readyQueue.peek() != null)
-					transferAllValuesToCPUPCB(PCB.readyQueue.remove(), cpuArray[i].getPCB());
-			}
-		}
+				while (!PCB.readyQueue.isEmpty() && !PCB.cpuWaitingQueue.isEmpty())
+					transferAllValuesToCPUPCB(PCB.readyQueue.remove(), PCB.cpuWaitingQueue.remove().getPCB());
 	}
+		
 	private void transferAllValuesToCPUPCB(Process readyProcess, PCBe cpuPCB) throws MemoryException{
 		cpuPCB.copyAllFrom(readyProcess.getAllRegisters());
 		//cpuPCB.cpuRegister.resetRegisters();

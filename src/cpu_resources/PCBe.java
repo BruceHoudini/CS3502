@@ -9,12 +9,12 @@ import os_resources.PState;
 import os_resources.Process;
 
 public class PCBe {
-	private int cpuID, PID, PC, numInst, numData, sizeInBuff, sizeOutBuff, sizeTempBuff, baseRegister, inBuffAddr, outBuffAddr, tempBuffAddr, inCount, outCount, tempCount, priority, pAddr;
-	private PState state;
-	public Registers cpuRegister = new Registers();
-	private String[] cache;
-	private Queue<Integer> changes = new LinkedList<Integer>();
-	private int sizeCache;
+	private volatile int cpuID, PID, PC, numInst, numData, sizeInBuff, sizeOutBuff, sizeTempBuff, baseRegister, inBuffAddr, outBuffAddr, tempBuffAddr, inCount, outCount, tempCount, priority, pAddr;
+	private volatile PState state;
+	public volatile Registers cpuRegister = new Registers();
+	private volatile String[] cache;
+	private volatile Queue<Integer> changes = new LinkedList<Integer>();
+	private volatile int sizeCache;
 	
 	public PCBe(int sizeCache){
 		this.sizeCache = sizeCache;

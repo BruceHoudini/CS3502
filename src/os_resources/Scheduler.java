@@ -15,7 +15,7 @@ public class Scheduler {
 	//RAM by the scheduler and are ready for dispatch. readyQueue may be relocated later.
 	
 	private static ArrayList<TripleP> availableRAM = new ArrayList<TripleP>();
-	public static Signal signal;
+	public static boolean scheduleLock = false;
 	
 	
 	
@@ -54,6 +54,7 @@ public class Scheduler {
 			}
 			priority = 1000;
 		}
+		shortSchedule();
 	}
 	
 	//First in first out scheduling algorithm performance testing.
@@ -229,6 +230,7 @@ public class Scheduler {
 			 for (int i = base; i <= end; i++){
 				 cpuPCB.save(RAM.load(i));
 			 }
+			 cpuPCB.setState(PState.RUNNING);
 		 }
 		 
 		 /*Currently this condition will never be met.
@@ -249,42 +251,46 @@ public class Scheduler {
 		 */
 	 }
 	 
-	 public static void shortSchedule(PCBe cpuPCB) throws MemoryException{
-		// int index = 0;
-		// while (index < PCB.memory.size() && PCB.memory.get(index).getPID() != cpuPCB.getPID())
-		//	 index++;
-		 Process proc = cpuPCB.savePCBeToProcess();
+	 public static void shortSchedule() throws MemoryException{
+		 while (!PCB.cpuBlockedQueue.isEmpty()){
+			 PCBe cpuPCB = PCB.cpuBlockedQueue.remove().getPCB();
 		 
-		 int base = proc.getRAddrBegin();
-		 int end = proc.getRAddrEnd();
-		 int tempIndex;
-		 if (cpuPCB.getState() == PState.WAITING){
-			//load all instructions from RAM into cache
-			 for (int i = base; i <= end; i++){
-				 cpuPCB.save(RAM.load(i));
+			 Process proc = cpuPCB.savePCBeToProcess();
+			 
+			 int base = proc.getRAddrBegin();
+			 int end = proc.getRAddrEnd();
+			 int tempIndex;
+			 if (cpuPCB.getState() == PState.WAITING){
+				//load all instructions from RAM into cache
+				 for (int i = base; i <= end; i++){
+					 cpuPCB.save(RAM.load(i));
+				 }
+				 cpuPCB.setState(PState.RUNNING);
 			 }
-		 }
-		 if (proc.getState() == PState.WAITING){
-			 //save all changes from cache to RAM, clear cache
-			 while (cpuPCB.isChangeEmpty() == false){
-				 tempIndex = cpuPCB.getChange();
-				 RAM.save((base + tempIndex), cpuPCB.load(tempIndex));
-				 proc.addChange(tempIndex);
+			 if (cpuPCB.getState() == PState.BLOCKED){
+				 //save all changes from cache to RAM, clear cache
+				 while (cpuPCB.isChangeEmpty() == false){
+					 tempIndex = cpuPCB.getChange();
+					 RAM.save((base + tempIndex), cpuPCB.load(tempIndex));
+					 proc.addChange(tempIndex);
+				 }
+				 cpuPCB.clearCache();
+				 cpuPCB.setState(PState.RUNNING);
 			 }
-			 cpuPCB.clearCache();
-		 }
-		 if (cpuPCB.getState() == PState.TERMINATED){
-			 //save all changes from cache to RAM, clear cache
-			 while (cpuPCB.isChangeEmpty() == false){
-				 tempIndex = cpuPCB.getChange();
-				 RAM.save((base + tempIndex), cpuPCB.load(tempIndex));
-				 proc.addChange(tempIndex);
+			 if (cpuPCB.getState() == PState.TERMINATED){
+				 //save all changes from cache to RAM, clear cache
+				 while (cpuPCB.isChangeEmpty() == false){
+					 tempIndex = cpuPCB.getChange();
+					 RAM.save((base + tempIndex), cpuPCB.load(tempIndex));
+					 proc.addChange(tempIndex);
+				 }
+				 cpuPCB.clearCache();
+				 updateDisk(proc);
+				 removeFromRAMList(cpuPCB.getPID());
+				 PCB.completedProcesses++;
+				 cpuPCB.setState(PState.RUNNING);
 			 }
-			 cpuPCB.clearCache();
-			 updateDisk(proc);
-			 removeFromRAMList(cpuPCB.getPID());
-			 PCB.completedProcesses++;
-		 }
+		}
 	 }
 	 private static void updateDisk(Process proc) throws MemoryException{
 		 int tempIndex;

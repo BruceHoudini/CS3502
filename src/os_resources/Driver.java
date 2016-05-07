@@ -17,7 +17,7 @@ import cpu_resources.CPUException;
 
 public class Driver {
 	
-	public static void main(String[] args) throws FileNotFoundException, OSException, MemoryException, CPUException{
+	public static void main(String[] args) throws FileNotFoundException, OSException, MemoryException, CPUException, InterruptedException{
 	
 		//File path for my PC, important to note that right click: Copy qualified name doesn't give you the 
 		//Explicit file path for the test document. Also, "\" is an escape character in java so in order to
@@ -31,24 +31,40 @@ public class Driver {
 		Dispatcher dispatchertest;
 		Scheduler scheduletest;
 		CPU[] cpuArray;
+		Thread[] threadArray;
 		
 		long startTime;
 		long stopTime;
-		int numProcessors;
-		int maxProcessors = 3;
+		int numProcessors = 4;
+		int maxProcessors = 4;
 		
-		for (numProcessors = 1; numProcessors <= maxProcessors; numProcessors++){
+		//for (numProcessors = 1; numProcessors <= maxProcessors; numProcessors++){
+			PCB.killFlag = false;
 			
 			loadertest = new Loader(testfile);
 			dispatchertest = new Dispatcher();
 			scheduletest = new Scheduler();
 			
 			cpuArray = new CPU[numProcessors];
-			for (int i = 0; i < numProcessors; i++)
-				cpuArray[i] = new CPU(i, loadertest.getLargestProcessSize());
+			threadArray = new Thread[numProcessors];
+			
+			for (int i = 0; i < numProcessors; i++){
+				int copy = i;
+				cpuArray[copy] = new CPU(copy, loadertest.getLargestProcessSize());
+				threadArray[copy] = new Thread(cpuArray[copy]);
+			}
 			
 			startTime = System.nanoTime();
+			
+			for (int i = 0; i < numProcessors; i++){
+				System.out.println("THIS HAS WORKED BEFORE START CALL: " + i + " NUMBER OF TIMES.");
+				//System.out.println("THIS IS THE THREAD ID BEFORE START CALL " + Thread.currentThread().getId());
+				threadArray[i].start();
+				//System.out.println("THIS IS THE THREAD ID AFTER START CALL " + Thread.currentThread().getId());
+				System.out.println("THIS HAS WORKED AFTER START CALL: " + i + " NUMBER OF TIMES.");
+			}
 			while (PCB.processTotal != PCB.completedProcesses){
+				
 				scheduletest.schedule();
 				/*
 				 * 
@@ -62,11 +78,15 @@ public class Driver {
 				//scheduletest.scheduleFIFO();
 				
 				dispatchertest.dispatch(cpuArray, numProcessors);
-				for (int i = 0; i < numProcessors; i++){
-					if(cpuArray[i].getPCB().getState() == PState.READY)
-						cpuArray[i].compute();
-				}
+				
+				
 			}
+			PCB.killFlag = true;
+			
+			for (int i = 0; i < numProcessors; i++){
+				threadArray[i].join();
+			}
+			
 			stopTime = System.nanoTime();
 			
 			System.out.println("\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
@@ -80,7 +100,7 @@ public class Driver {
 			//CPU times in the driver. Need to be reset or they will accumulate each iteration's program count.
 			PCB.processTotal = 0;
 			PCB.completedProcesses = 0;
-		}
+		//}
 	}
 
 }

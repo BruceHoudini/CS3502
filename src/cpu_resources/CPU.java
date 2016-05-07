@@ -10,28 +10,56 @@ import os_resources.Scheduler;
 //Finish decode, decode will return Instruction object.
 //Finish execute, execute will take an Instruction object.
 
-public class CPU {
+public class CPU implements Runnable{
 	public PCBe pcb;
 	public int ID;
 	public Status status;
+	private int waitLoop = 0;
 	//private InsFormat insForm;
 	//private InsName opCode;
 	public CPU(int id, int sizeCache){
 		pcb = new PCBe(sizeCache);
 		pcb.setCPUID(id);
 		pcb.setState(PState.WAITING);
+		PCB.cpuWaitingQueue.add(this);
 	}
 	
-	public void compute() throws MemoryException, CPUException{
+	//public void compute() throws MemoryException, CPUException{
+	
+	public void run(){
+		while (PCB.killFlag == false)
+			if (pcb.getState() == PState.READY)
+				execute();
+	}
+	
+	public void execute(){
+		
 		pcb.setState(PState.RUNNING);
 		while (pcb.getPC() < pcb.getNumInst())
-			Execute(Decode(Fetch()));	
+			try {
+				Execute(Decode(Fetch()));
+			} catch (CPUException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (MemoryException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}	
 		
 		
-		Scheduler.shortSchedule(pcb);
+		
+			PCB.cpuBlockedQueue.add(this);
+		
+		while (pcb.getState() != PState.RUNNING){
+			waitLoop++;
+		}
+		
+		System.out.println("This is the value of waitLoop: " + waitLoop);
+		System.out.println("From thread number: " + Thread.currentThread().getId());
 		
 		pcb.cpuRegister.resetRegisters();
 		pcb.setState(PState.WAITING);
+		PCB.cpuWaitingQueue.add(this);
 	}
 	
 	

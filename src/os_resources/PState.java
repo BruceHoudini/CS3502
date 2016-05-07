@@ -1,5 +1,5 @@
 package os_resources;
 
 public enum PState {
-	NEW, READY, RUNNING, WAITING, TERMINATED
+	NEW, READY, RUNNING, WAITING, TERMINATED, BLOCKED
 }
