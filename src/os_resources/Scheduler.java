@@ -1,5 +1,6 @@
 package os_resources;
 
+import cpu_resources.PCBe;
 import cpu_resources.Signal;
 
 import java.util.ArrayList;
@@ -13,7 +14,7 @@ public class Scheduler {
 	//readyQueue is a queue of Process objects which have been loaded into
 	//RAM by the scheduler and are ready for dispatch. readyQueue may be relocated later.
 	
-	public static ArrayList<TripleP> availableRAM = new ArrayList<TripleP>();
+	private static ArrayList<TripleP> availableRAM = new ArrayList<TripleP>();
 	public static Signal signal;
 	
 	
@@ -155,7 +156,7 @@ public class Scheduler {
 	
 	
 	
-	public static void removeFromRAMList(int pid){
+	private static void removeFromRAMList(int pid){
 		for (int i = 0; i < availableRAM.size(); i++){
 			if (availableRAM.get(i).getPID() == pid){
 				availableRAM.remove(i);
@@ -165,7 +166,7 @@ public class Scheduler {
 	}
 	
 	//Simple bubble sort by lowest address for use in conjunction with isSpace
-	 public static void sortRAMList(){
+	 private static void sortRAMList(){
 	        TripleP temp;
 	        if (availableRAM.size() > 1){
 		        for(int i=0; i < availableRAM.size()-1; i++){
@@ -181,7 +182,7 @@ public class Scheduler {
 	    }
 	 
 	 //Checks if RAM contains a contiguous address space greater than or equal to size. 
-	 public boolean isSpace(int size){
+	 private boolean isSpace(int size){
 		 boolean result = false;
 		 if (availableRAM.isEmpty()){
 			 RAM.setPointer(0);
@@ -211,12 +212,89 @@ public class Scheduler {
 			 
 	 }
 	 
-	 public static void printRAMList(){
+	 public void printRAMList(){
 		 for (int i = 0; i < availableRAM.size(); i++){
 			 System.out.println("This is the PID: " + availableRAM.get(i).getPID());
 			 System.out.println("This is the lower bound: " + availableRAM.get(i).getLow());
 			 System.out.println("This is the upper bound: " + availableRAM.get(i).getUpper());
 		 }
+	 }
+	 
+	 public static void shortSchedule(Process proc, PCBe cpuPCB) throws MemoryException{
+		 int base = proc.getRAddrBegin();
+		 int end = proc.getRAddrEnd();
+		 // int tempIndex;
+		 if (proc.getState() == PState.RUNNING){
+			//load all instructions from RAM into cache
+			 for (int i = base; i <= end; i++){
+				 cpuPCB.save(RAM.load(i));
+			 }
+		 }
+		 
+		 /*Currently this condition will never be met.
+		  * Only relevant in situation where context switching is required
+		  * Current program state performs no context switching.
+		  * Should context switching be implemented, shortSchedule should be merged
+		  * into one method which only accepts a cpuPCB.
+		  * 
+		 if (proc.getState() == PState.WAITING){
+			 //save all changes from cache to RAM, clear cache
+			 while (cpuPCB.isChangeEmpty() == false){
+				 tempIndex = cpuPCB.getChange();
+				 RAM.save((base + tempIndex), cpuPCB.load(tempIndex));
+				 proc.addChange(tempIndex);
+			 }
+			 cpuPCB.clearCache();
+		 }
+		 */
+	 }
+	 
+	 public static void shortSchedule(PCBe cpuPCB) throws MemoryException{
+		// int index = 0;
+		// while (index < PCB.memory.size() && PCB.memory.get(index).getPID() != cpuPCB.getPID())
+		//	 index++;
+		 Process proc = cpuPCB.savePCBeToProcess();
+		 
+		 int base = proc.getRAddrBegin();
+		 int end = proc.getRAddrEnd();
+		 int tempIndex;
+		 if (cpuPCB.getState() == PState.WAITING){
+			//load all instructions from RAM into cache
+			 for (int i = base; i <= end; i++){
+				 cpuPCB.save(RAM.load(i));
+			 }
+		 }
+		 if (proc.getState() == PState.WAITING){
+			 //save all changes from cache to RAM, clear cache
+			 while (cpuPCB.isChangeEmpty() == false){
+				 tempIndex = cpuPCB.getChange();
+				 RAM.save((base + tempIndex), cpuPCB.load(tempIndex));
+				 proc.addChange(tempIndex);
+			 }
+			 cpuPCB.clearCache();
+		 }
+		 if (cpuPCB.getState() == PState.TERMINATED){
+			 //save all changes from cache to RAM, clear cache
+			 while (cpuPCB.isChangeEmpty() == false){
+				 tempIndex = cpuPCB.getChange();
+				 RAM.save((base + tempIndex), cpuPCB.load(tempIndex));
+				 proc.addChange(tempIndex);
+			 }
+			 cpuPCB.clearCache();
+			 updateDisk(proc);
+			 removeFromRAMList(cpuPCB.getPID());
+			 PCB.completedProcesses++;
+		 }
+	 }
+	 private static void updateDisk(Process proc) throws MemoryException{
+		 int tempIndex;
+		 
+		 while (proc.isChangeEmpty() == false){
+			 tempIndex = proc.getChange();
+			 DISK.save((proc.getPAddr() + tempIndex), RAM.load((proc.getRAddrBegin() + tempIndex)));
+		 }
+		 
+		 
 	 }
 	
 

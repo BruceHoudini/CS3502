@@ -16,8 +16,8 @@ public class CPU {
 	public Status status;
 	//private InsFormat insForm;
 	//private InsName opCode;
-	public CPU(int id){
-		pcb = new PCBe();
+	public CPU(int id, int sizeCache){
+		pcb = new PCBe(sizeCache);
 		pcb.setCPUID(id);
 		pcb.setState(PState.WAITING);
 	}
@@ -28,10 +28,7 @@ public class CPU {
 			Execute(Decode(Fetch()));	
 		
 		
-		
-		Scheduler.removeFromRAMList(pcb.getPID());
-		PCB.completedProcesses++;
-		
+		Scheduler.shortSchedule(pcb);
 		
 		pcb.cpuRegister.resetRegisters();
 		pcb.setState(PState.WAITING);

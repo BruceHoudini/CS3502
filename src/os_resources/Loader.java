@@ -6,15 +6,23 @@
 
 	public class Loader {
 		
+		private int largestProcess;
 		
 		public Loader(File programfile) throws FileNotFoundException, OSException, MemoryException{
+			//This comment has been added at a later time than the comment 7 lines down. After adding a method
+			//within the scheduler which saves modified RAM to DISK suddenly the DISK Pointer is no longer exclusively
+			//manipulated by the loader. Therefore the DISK.setPointer(0) is nullified, creating similar problems compared
+			//to before it was added. I have decided to add DISK.setPointer(0) to the beginning of the loader as well and
+			//am retaining the other pointer set and comment for the sake of documenting the progress of this project.
+			DISK.setPointer(0);
+			largestProcess = 0;
 			Scanner scan = new Scanner(programfile);
 			processFile(scan);
 			scan.close();
 			
 			//The DISK pointer is never reset during the life of the program, but as it is part of the static
-			//DISK class, it retains its value through the iterative, increasing processor core timing loop I've used
-			//in the driver program. I have chose to reset it here, at the termination point of the loader.
+			//DISK class, it retains its value through the iterative increasing processor core timing test loop I've used
+			//in the driver program. I have chosen to reset it here, at the termination point of the loader.
 			DISK.setPointer(0);
 		}
 		private void processFile(Scanner scan)throws OSException, MemoryException{
@@ -97,6 +105,11 @@
 				
 				numData = saveToDisk(scan);
 			}
+			
+			//Logs largest process size for use in cpu cache creation
+			if (numInst + sizeInBuff + sizeOutBuff + sizeTempBuff > largestProcess)
+				largestProcess = numInst + sizeInBuff + sizeOutBuff + sizeTempBuff;
+				
 			PCB.memory.add(new Process(PID, pAddr, numInst, numData, priority, sizeInBuff, sizeOutBuff, sizeTempBuff));
 			PCB.processTotal++;
 			DISK.setPointer(pAddr + numInst + sizeInBuff + sizeOutBuff + sizeTempBuff);
@@ -198,5 +211,9 @@
 			else
 				return i - numWrites;
 		}
+		public int getLargestProcessSize(){
+			return largestProcess;
+		}
+		
 
 	}

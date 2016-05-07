@@ -2,8 +2,6 @@ package cpu_resources;
 
 import java.math.BigInteger;
 
-import os_resources.RAM;
-
 public class CBIForm extends Instruction{
 	private PCBe pcb;
 	private int sourceReg;
@@ -20,11 +18,11 @@ public class CBIForm extends Instruction{
 	@Override
 	boolean execute() {
 		if(opcode == InsName.ST_INS){
-			RAM.indirectSave(pcb.getBaseRegister(), Integer.parseInt(pcb.cpuRegister.getReg(destination), 2), pcb.cpuRegister.getReg(sourceReg));
+			pcb.indirectSave(pcb.getBaseRegister(), Integer.parseInt(pcb.cpuRegister.getReg(destination), 2), pcb.cpuRegister.getReg(sourceReg));
 			return true;
 		}
 		else if (opcode == InsName.LW_INS  ){
-			pcb.cpuRegister.setReg(destination, RAM.indirectLoad(pcb.getBaseRegister(), Integer.parseInt(pcb.cpuRegister.getReg(sourceReg), 2)));
+			pcb.cpuRegister.setReg(destination, pcb.indirectLoad(pcb.getBaseRegister(), Integer.parseInt(pcb.cpuRegister.getReg(sourceReg), 2)));
 			return true;
 		}
 		else if (opcode == InsName.MOVI_INS){

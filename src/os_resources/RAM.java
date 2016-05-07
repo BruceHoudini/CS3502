@@ -9,6 +9,7 @@ public class RAM {
 	private static String[] memory = new String[1024];
 
 	//Don't know if pointer will be necessary but I thought I would go ahead and add it anyways.
+	//EDIT: Whether it was necessary or not it is now a central part of the memory system.
 	private static int pointer;
 	private static int tail = 0;
 	

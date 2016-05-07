@@ -1,4 +1,7 @@
 package os_resources;
+import java.util.LinkedList;
+import java.util.Queue;
+
 import cpu_resources.Registers;
 
 public class Process {
@@ -7,6 +10,7 @@ public class Process {
 	private boolean loadedRAM, isReady;
 	private PState state;
 	private Registers pRegister;
+	private Queue<Integer> changes = new LinkedList<Integer>();
 	public Process(int PID, int pAddr, int numInst, int numData, int priority, int sizeInBuff, int sizeOutBuff, int sizeTempBuff){
 		this.PID = PID;
 		this.pAddr = pAddr;
@@ -29,6 +33,19 @@ public class Process {
 		tempCount = 0;
 		state = PState.NEW;
 		pRegister = new Registers();
+	}
+	
+	public void addChange(int index){
+		changes.add(index);
+	}
+	public int getChange(){
+		return changes.remove();
+	}
+	public boolean isChangeEmpty(){
+		return changes.isEmpty();
+	}
+	public void clearChanges(){
+		changes.clear();
 	}
 	
 	//Obnoxiously long list of getters/setters

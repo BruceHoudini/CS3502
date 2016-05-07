@@ -35,7 +35,7 @@ public class Driver {
 		long startTime;
 		long stopTime;
 		int numProcessors;
-		int maxProcessors = 30;
+		int maxProcessors = 3;
 		
 		for (numProcessors = 1; numProcessors <= maxProcessors; numProcessors++){
 			
@@ -43,44 +43,44 @@ public class Driver {
 			dispatchertest = new Dispatcher();
 			scheduletest = new Scheduler();
 			
-		cpuArray = new CPU[numProcessors];
-		for (int i = 0; i < numProcessors; i++)
-			cpuArray[i] = new CPU(i);
-		
-		startTime = System.nanoTime();
-		while (PCB.processTotal != PCB.completedProcesses){
-			scheduletest.schedule();
-			/*
-			 * 
-			 * FIFO Scheduling for performance testing.
-			 * Toggle either via commenting/uncommenting.
-			 * Although both can be active simultaneously
-			 * The first method to be called will dominate
-			 * the other.
-			 * 
-			 */
-			//scheduletest.scheduleFIFO();
+			cpuArray = new CPU[numProcessors];
+			for (int i = 0; i < numProcessors; i++)
+				cpuArray[i] = new CPU(i, loadertest.getLargestProcessSize());
 			
-			dispatchertest.dispatch(cpuArray, numProcessors);
-			for (int i = 0; i < numProcessors; i++){
-				if(cpuArray[i].getPCB().getState() == PState.READY)
-					cpuArray[i].compute();
+			startTime = System.nanoTime();
+			while (PCB.processTotal != PCB.completedProcesses){
+				scheduletest.schedule();
+				/*
+				 * 
+				 * FIFO Scheduling for performance testing.
+				 * Toggle either via commenting/uncommenting.
+				 * Although both can be active simultaneously
+				 * The first method to be called will dominate
+				 * the other.
+				 * 
+				 */
+				//scheduletest.scheduleFIFO();
+				
+				dispatchertest.dispatch(cpuArray, numProcessors);
+				for (int i = 0; i < numProcessors; i++){
+					if(cpuArray[i].getPCB().getState() == PState.READY)
+						cpuArray[i].compute();
+				}
 			}
+			stopTime = System.nanoTime();
+			
+			System.out.println("\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+			System.out.println("CORE COUNT: " + numProcessors);
+			System.out.println("Numbers of Processes completed: " + PCB.completedProcesses);
+			System.out.print("TOTAL NANOSECONDS FOR COMPLETION: ");
+			System.out.println(stopTime - startTime + " nanoseconds.");
+			System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+			
+			//Static variables mainly used for debugging and, in this case, to control the testing loop for 
+			//CPU times in the driver. Need to be reset or they will accumulate each iteration's program count.
+			PCB.processTotal = 0;
+			PCB.completedProcesses = 0;
 		}
-		stopTime = System.nanoTime();
-		
-		System.out.println("\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
-		System.out.println("CORE COUNT: " + numProcessors);
-		System.out.println("Numbers of Processes completed: " + PCB.completedProcesses);
-		System.out.print("TOTAL NANOSECONDS FOR COMPLETION: ");
-		System.out.println(stopTime - startTime + " nanoseconds.");
-		System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
-		
-		//Static variables mainly used for debugging and, in this case, to control the testing loop for 
-		//CPU times in the driver. Need to be reset or they will accumulate each iteration's program count.
-		PCB.processTotal = 0;
-		PCB.completedProcesses = 0;
-	}
 	}
 
 }

@@ -7,7 +7,7 @@ import cpu_resources.Status;
 
 public class Dispatcher {
 	
-	public void dispatch(CPU[] cpuArray, int numProcessors){
+	public void dispatch(CPU[] cpuArray, int numProcessors) throws MemoryException{
 		for (int i = 0; i < numProcessors; i++){
 			if (cpuArray[i].getPCB().getState() == PState.WAITING){
 				if (PCB.readyQueue.peek() != null)
@@ -15,7 +15,7 @@ public class Dispatcher {
 			}
 		}
 	}
-	private void transferAllValuesToCPUPCB(Process readyProcess, PCBe cpuPCB){
+	private void transferAllValuesToCPUPCB(Process readyProcess, PCBe cpuPCB) throws MemoryException{
 		cpuPCB.copyAllFrom(readyProcess.getAllRegisters());
 		//cpuPCB.cpuRegister.resetRegisters();
 		cpuPCB.setCPUID(cpuPCB.getCpuID());
@@ -35,6 +35,7 @@ public class Dispatcher {
 		cpuPCB.setOutCount(readyProcess.getOutCount());
 		cpuPCB.setTempCount(readyProcess.getTempCount());
 		readyProcess.setState(PState.RUNNING);
+		Scheduler.shortSchedule(readyProcess, cpuPCB);
 		cpuPCB.setState(PState.READY);
 	}
 

@@ -1,7 +1,5 @@
 package cpu_resources;
 
-import os_resources.RAM;
-
 public class IOForm extends Instruction {
 	
 	private PCBe pcb;
@@ -20,13 +18,13 @@ public class IOForm extends Instruction {
 	boolean execute() {
 		if (opcode == InsName.RD_INS){
 			if (ioAddress == 0){
-				pcb.cpuRegister.setReg(sourceReg, RAM.indirectLoad(pcb.getBaseRegister(), Integer.parseInt(pcb.cpuRegister.getReg(sourceTwo), 2)));}
+				pcb.cpuRegister.setReg(sourceReg, pcb.indirectLoad(pcb.getBaseRegister(), Integer.parseInt(pcb.cpuRegister.getReg(sourceTwo), 2)));}
 			else
-				pcb.cpuRegister.setReg(sourceReg, RAM.indirectLoad(pcb.getBaseRegister(), ioAddress));
+				pcb.cpuRegister.setReg(sourceReg, pcb.indirectLoad(pcb.getBaseRegister(), ioAddress));
 			return true;
 		}
 		else if (opcode == InsName.WR_INS){
-			RAM.indirectSave(pcb.getBaseRegister(), ioAddress, pcb.cpuRegister.getReg(sourceReg));
+			pcb.indirectSave(pcb.getBaseRegister(), ioAddress, pcb.cpuRegister.getReg(sourceReg));
 			return true;
 		}
 		else if (opcode == InsName.NOP_INS){

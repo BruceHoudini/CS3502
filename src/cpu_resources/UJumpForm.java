@@ -2,6 +2,8 @@ package cpu_resources;
 
 import java.math.BigInteger;
 
+import os_resources.PState;
+
 public class UJumpForm extends Instruction{
 	private PCBe pcb;
 	int address;
@@ -16,6 +18,7 @@ public class UJumpForm extends Instruction{
 	@Override
 	boolean execute() {
 		if (opcode == InsName.HLT_INS){
+			pcb.setState(PState.TERMINATED);
 			return true;
 		}
 		else if(opcode == InsName.JMP_INS){
